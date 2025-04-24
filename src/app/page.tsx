@@ -28,19 +28,19 @@ export default function Home() {
 
   const incrementCount = () => {
     setIsWawaing(true);
+    setCount((prevCount) => prevCount - 1);
     setTimeout(() => {
       setIsWawaing(false);
-      setCount((prevCount) => prevCount + 1);
     }, 150);
   };
 
   const deincrementCount = () => {
     setIsUnwawa(true);
     setIsWawaing(true);
+    setCount((prevCount) => prevCount - 1);
     setTimeout(() => {
       setIsWawaing(false);
       setIsUnwawa(false);
-      setCount((prevCount) => prevCount - 1);
     }, 1000);
   };
 
@@ -68,8 +68,8 @@ export default function Home() {
       </div>      
       <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
         {isWawaing ? (isUnwawa ? (<Image
-            src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/aw.png?raw=true"
-            alt=">:("
+            src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/sad.png?raw=true"
+            alt=":("
             width={500}
             height={500}
             className="animate-wiggle"
