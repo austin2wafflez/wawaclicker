@@ -2,9 +2,9 @@
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";import { useState } from "react";
 import { useEffect } from "react";
+import { useTheme } from "next-themes";
 
 export default function Home() {
-  import { useTheme } from "next-themes";
 
   const [count, setCount] = useState(0);
   const { theme, setTheme } = useTheme();
@@ -63,4 +63,3 @@ export default function Home() {
     </main>
   );
 }
-
