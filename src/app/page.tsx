@@ -13,8 +13,8 @@ import { useRef } from "react";
 
 export default function Home() {
 
-  const wawaImage = useRef<HTMLImageElement>(null);
   const [isWawaing, setIsWawaing] = useState(false);
+  const [isUnwawa, setIsUnwawa] = useState(false);
 
   const [count, setCount] = useState(0);
   const { theme, setTheme } = useTheme();
@@ -35,7 +35,13 @@ export default function Home() {
   };
 
   const deincrementCount = () => {
-    setCount((prevCount) => prevCount - 1);
+    setIsUnwawa(true);
+    setIsWawaing(true);
+    setTimeout(() => {
+      setIsWawaing(false);
+      setIsUnwawa(false);
+      setCount((prevCount) => prevCount - 1);
+    }, 1000);
   };
 
 
@@ -52,7 +58,7 @@ export default function Home() {
         <span className={theme === "dark" ? "text-white" : ""}>{count}</span> times!</>
         )}
       </div>
-<div className="flex space-x-4">
+<div className="flex space-x-4 relative">
         <Button variant="default" className={`text-lg md:text-xl p-6 rounded-full transition-transform active:scale-95 ${theme === "dark" ? "bg-white text-black" : "bg-gray-400 text-white"}`} onClick={incrementCount}>
           Wawa :3
         </Button>
@@ -60,20 +66,25 @@ export default function Home() {
           Unwawa 3:
         </Button>
       </div>      
-      
-      <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-        {isWawaing ? (
-          <Image
-            src="/wa.png"
-            alt=":D"
-            width={100}
-            height={100}
+      <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
+        {isWawaing ? (isUnwawa ? (<Image
+            src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/aw.png?raw=true"
+            alt=">:("
+            width={500}
+            height={500}
             className="animate-wiggle"
-          />) : (<Image
-            src="/aw.png"
+          />) : (
+          <Image
+            src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/wa.png?raw=true"
+            alt=":D"
+            width={500}
+            height={500}
+            className="animate-wiggle"
+          />)) : (<Image
+            src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/aw.png?raw=true"
             alt=":3"
-            width={100}
-            height={100}/>
+            width={500}
+            height={500}/>
         )}
       </div>
     </main>
