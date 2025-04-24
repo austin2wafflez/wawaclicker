@@ -1,14 +1,9 @@
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3278053743.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3639530951.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:502769164.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3208014068.
 "use client"
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-
 import { useCookies } from "react-cookie";
 
 
