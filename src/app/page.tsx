@@ -10,6 +10,8 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useRef } from "react";
 
+  const pageName = "clickclick";
+
 
 export default function Home() {
 
@@ -28,7 +30,8 @@ export default function Home() {
 
   const incrementCount = () => {
     setIsWawaing(true);
-    setCount((prevCount) => prevCount - 1);
+    setIsUnwawa(false);
+    setCount((prevCount) => prevCount + 1);
     setTimeout(() => {
       setIsWawaing(false);
     }, 150);
@@ -38,10 +41,13 @@ export default function Home() {
     setIsUnwawa(true);
     setIsWawaing(true);
     setCount((prevCount) => prevCount - 1);
-    setTimeout(() => {
+    if (!isUnwawa) {
+      if (isWawaing) {
       setIsWawaing(false);
       setIsUnwawa(false);
-    }, 1000);
+    }
+  }
+  
   };
 
 
