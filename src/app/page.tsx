@@ -8,25 +8,42 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { useRef } from "react";
 
-  const pageName = "clickclick";
+import { useCookies } from "react-cookie";
+
+
 
 
 export default function Home() {
 
   const [isWawaing, setIsWawaing] = useState(false);
   const [isUnwawa, setIsUnwawa] = useState(false);
-
-  const [count, setCount] = useState(0);
+  const [cookies, setCookie] = useCookies(["count"]);
+  const initialCount = cookies.count ? parseInt(cookies.count) : 0;
+  const [count, setCount] = useState(initialCount);
   const { theme, setTheme } = useTheme();
+
+
+
+
+    setCount((prevCount) => {
+      const newCount = prevCount + 1;
+      setCookie("count", newCount, { path: "/" });
+      return newCount;
+    });
+
+    setCount((prevCount) => {
+      const newCount = prevCount - 1;
+      setCookie("count", newCount, { path: "/" });
+      return newCount;
+    });
 
   useEffect(() => {
     const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (prefersDarkMode) {
-        setTheme("dark");
+      setTheme("dark");
     }
-}, []);
+  }, []);
 
   const incrementCount = () => {
     setIsWawaing(true);
@@ -43,12 +60,14 @@ export default function Home() {
     setCount((prevCount) => prevCount - 1);
     if (!isUnwawa) {
       if (isWawaing) {
-      setIsWawaing(false);
-      setIsUnwawa(false);
+        setIsWawaing(false);
+        setIsUnwawa(false);
+      }
     }
-  }
-  
+
   };
+
+
 
 
   return (
@@ -61,25 +80,25 @@ export default function Home() {
         {count < 0 ? (
           <span className="text-red-500">{count} times...</span>
         ) : (<>
-        <span className={theme === "dark" ? "text-white" : ""}>{count}</span> times!</>
+          <span className={theme === "dark" ? "text-white" : ""}>{count}</span> times!</>
         )}
       </div>
-<div className="flex space-x-4 relative">
+      <div className="flex space-x-4 relative">
         <Button variant="default" className={`text-lg md:text-xl p-6 rounded-full transition-transform active:scale-95 ${theme === "dark" ? "bg-white text-black" : "bg-gray-400 text-white"}`} onClick={incrementCount}>
           Wawa :3
         </Button>
         <Button variant={theme === "dark" ? "secondary" : "destructive"} className={`text-lg md:text-xl p-6 rounded-full transition-transform active:scale-95 ${theme === "dark" ? "bg-blue-400 text-white" : ""}`} onClick={deincrementCount}>
           Unwawa 3:
         </Button>
-      </div>      
+      </div>
       <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
         {isWawaing ? (isUnwawa ? (<Image
-            src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/sad.png?raw=true"
-            alt=":("
-            width={500}
-            height={500}
-            className="animate-wiggle"
-          />) : (
+          src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/sad.png?raw=true"
+          alt=":("
+          width={500}
+          height={500}
+          className="animate-wiggle"
+        />) : (
           <Image
             src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/wa.png?raw=true"
             alt=":D"
@@ -90,7 +109,7 @@ export default function Home() {
             src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/aw.png?raw=true"
             alt=":3"
             width={500}
-            height={500}/>
+            height={500} />
         )}
       </div>
     </main>
