@@ -1,7 +1,7 @@
 "use client";
 
 //importing
-
+import { toast } from "sonner";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
@@ -9,6 +9,8 @@ import Image from "next/image";
 import { getCookie, setCookie } from "cookies-next";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { isMobile } from "react-device-detect";
+
 
 const Divider: React.FC = () => {
   return <div style={{ height: '13px', visibility: 'hidden' }} />;
@@ -25,7 +27,24 @@ export default function Home() {
   const [displayCount, setDisplayCount] = useState<number>(count);
   const [wps, setWps] = useState<string>("0");
 
+  useEffect(() => {
+    let alertShown = false;
+    const storedCount = getCookie('wawas');
+    if (storedCount) {
+      if (!alertShown) {
+      if (isMobile) {
+        toast.success("data loaded :3");
+      } else {
+        window.alert("data loaded :3");
+        }
+        alertShown = true
+      }
+    }
+  }, []);
+
+
   //shop stuff
+
 
   const [botBuyButtonText, setBotBuyButtonText] = useState(
     "30W$ - wawabot3000 - buy nao!!!"
@@ -135,7 +154,7 @@ export default function Home() {
     return () => {
       if (intervalTimer) clearInterval(intervalTimer);
     }
-    
+
     // reset
 
   }, [botClicking]);
@@ -143,7 +162,7 @@ export default function Home() {
   useEffect(() => {
     let intervalTimer: NodeJS.Timeout | null = null;
 
-    if(forumClicking > 0){
+    if (forumClicking > 0) {
       intervalTimer = setInterval(() => {
         artiCount();
         artiCount();
@@ -216,6 +235,15 @@ export default function Home() {
   //make numbers act cool
   useEffect(() => {
     if (Math.abs(count - displayCount) > 1) {
+      let intervalTime;
+      const difference = Math.abs(count - displayCount);
+      if (difference > 1000) {
+          intervalTime = 3; // Very fast for large differences
+      } else if (difference > 100) {
+          intervalTime = 25; // Faster for moderately large differences
+      } else {
+          intervalTime = 55; // Slower for smaller differences
+      }
       const interval = setInterval(() => {
         setDisplayCount((prevDisplayCount) => {
           if (prevDisplayCount < count) {
@@ -227,28 +255,26 @@ export default function Home() {
             return prevDisplayCount;
           }
         });
-      }, 55); // adjust the time it takes to count in milliseconds - less = faster count up
+      }, intervalTime); 
 
       return () => clearInterval(interval)
-    } else if (count !== displayCount){
+    } else if (count !== displayCount) {
       setDisplayCount(count);
     }
-    }, [count, displayCount])
+  }, [count, displayCount])
 
   //wawa count, wawacat, wawashop
 
   return (
     <main
-      className={`flex flex-col items-start justify-center min-h-screen p-4 ${
-        theme === "dark"
+      className={`flex flex-col items-start justify-center min-h-screen p-4 ${theme === "dark"
           ? "bg-blue-950 text-white"
           : "bg-white text-black"
-      }`}
+        }`}
     >
       <h1
-        className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-8 ${
-          theme === "dark" ? "text-white" : ""
-        }`}
+        className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-8 ${theme === "dark" ? "text-white" : ""
+          }`}
       >
         You have wawa'd
       </h1>
@@ -263,17 +289,19 @@ export default function Home() {
           </>
         )}
       </div>
+       <div className="w-full flex justify-left">
       <div className="text-xs text-gray-500">{wps} wawas per second</div>
+            </div>
+
 
 
       <div className="flex space-x-4 relative">
         <Button
           variant="default"
-          className={`text-lg md:text-xl p-6 rounded-full transition-transform active:scale-95 ${
-            theme === "dark"
+          className={`text-lg md:text-xl p-6 rounded-full transition-transform active:scale-95 ${theme === "dark"
               ? "bg-white text-black"
               : "bg-gray-400 text-white"
-          }`}
+            }`}
           onClick={incrementCount}
         >
           Wawa :3
@@ -361,9 +389,8 @@ export default function Home() {
       </Sheet>
 
       <div
-        className={`transition-opacity ${
-          isMenuOpen ? "opacity-50" : "opacity-100"
-        }`}
+        className={`transition-opacity ${isMenuOpen ? "opacity-50" : "opacity-100"
+          }`}
       >
       </div>
     </main>
