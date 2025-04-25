@@ -1,70 +1,56 @@
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:3278053743.
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:3639530951.
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:502769164.
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:3208014068.
 "use client"
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useTheme } from "next-themes";
-import Image from "next/image";
-import { useCookies } from "react-cookie";
-
-
+import Image from "next/image"; // Import Image
+import { getCookie, setCookie } from 'cookies-next';
 
 
 export default function Home() {
+  const [count, setCount] = useState<number>(() => {
+    const storedCount = getCookie('wawas');
+    return storedCount ? parseInt(storedCount as string, 10) : 0;
+  });
+  enum WawaState {
+    Normal = 'normal',
+    Wawa = 'wawa',
+    Unwawa = 'unwawa',
+    Recover = 'rewawa'
+  }
 
-  const [isWawaing, setIsWawaing] = useState(false);
-  const [isUnwawa, setIsUnwawa] = useState(false);
-  const [cookies, setCookie] = useCookies(["count"]);
-  const initialCount = cookies.count ? parseInt(cookies.count) : 0;
-  const [count, setCount] = useState(initialCount);
+  const [wawaState, setWawaState] = useState<WawaState>(WawaState.Normal);
   const { theme, setTheme } = useTheme();
 
-
-
-
-    setCount((prevCount) => {
-      const newCount = prevCount + 1;
-      setCookie("count", newCount, { path: "/" });
-      return newCount;
-    });
-
-    setCount((prevCount) => {
-      const newCount = prevCount - 1;
-      setCookie("count", newCount, { path: "/" });
-      return newCount;
-    });
-
   useEffect(() => {
-    const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (prefersDarkMode) {
-      setTheme("dark");
-    }
-  }, []);
+    setCookie('wawas', count.toString());
+  }, [count]);
 
   const incrementCount = () => {
-    setIsWawaing(true);
-    setIsUnwawa(false);
-    setCount((prevCount) => prevCount + 1);
+    setCount(prevCount => prevCount + 1);
+
+    if (wawaState === WawaState.Unwawa) {
+      setWawaState(WawaState.Recover);
+    }
+
+    setWawaState(WawaState.Wawa);
     setTimeout(() => {
-      setIsWawaing(false);
+      setWawaState(WawaState.Normal);
+      
     }, 150);
   };
 
   const deincrementCount = () => {
-    setIsUnwawa(true);
-    setIsWawaing(true);
-    setCount((prevCount) => prevCount - 1);
-    if (!isUnwawa) {
-      if (isWawaing) {
-        setIsWawaing(false);
-        setIsUnwawa(false);
-      }
+    setWawaState(WawaState.Unwawa);
+    setCount(prevCount => prevCount - 1);
+    if (wawaState === WawaState.Recover) {
+      setWawaState(WawaState.Normal);
     }
-
   };
-
-
-
-
   return (
     <main className={`flex flex-col items-start justify-center min-h-screen p-4 ${theme === "dark" ? "bg-blue-950 text-white" : "bg-white text-black"}`}>
 
@@ -87,24 +73,30 @@ export default function Home() {
         </Button>
       </div>
       <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
-        {isWawaing ? (isUnwawa ? (<Image
-          src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/sad.png?raw=true"
-          alt=":("
-          width={500}
-          height={500}
-          className="animate-wiggle"
-        />) : (
+        {wawaState === WawaState.Wawa ? (
           <Image
-            src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/wa.png?raw=true"
+            src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png"
             alt=":D"
             width={500}
             height={500}
             className="animate-wiggle"
-          />)) : (<Image
-            src="https://github.com/austin2wafflez/wawaclicker/blob/master/src/app/aw.png?raw=true"
+            priority
+          />
+        ) : wawaState === WawaState.Unwawa ? (
+          <Image
+            src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sad.png"
+            alt=":("
+            width={500}
+            height={500}
+            className="animate-wiggle"
+          />
+        ) : (
+          <Image
+            src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/aw.png"
             alt=":3"
             width={500}
-            height={500} />
+            height={500}
+          />
         )}
       </div>
     </main>
