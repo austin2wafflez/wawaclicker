@@ -12,6 +12,9 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { isMobile } from "react-device-detect";
 import Head from "next/head";
 
+<Head>
+<title>clickclick - loading wawas...</title>
+</Head>
 
 
 
@@ -48,16 +51,13 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       document.title = `clickclick - ${count} wawas`;
-    }, 2000); // Update title every 2 seconds
+    }, 500); // Update title every half a second
 
-    // Cleanup the interval on unmount
+    // cleanup the interval on unmount
     return () => clearInterval(interval);
   }, [count]);
 
 
-  <Head>
-  <title>clickclick - loading wawas...</title>
-</Head>
 
   //shop stuff
 
@@ -251,6 +251,7 @@ export default function Home() {
   //make numbers act cool
   useEffect(() => {
     if (Math.abs(count - displayCount) > 1) {
+      let timeoutId: NodeJS.Timeout | null = null;
       let intervalTime;
       const difference = Math.abs(count - displayCount);
       if (difference > 1000) {
@@ -271,11 +272,33 @@ export default function Home() {
             return prevDisplayCount;
           }
         });
+
+        if (!timeoutId) {
+          timeoutId = setTimeout(() => {
+            setShowJumpButton(true);
+          }, 5000);
+        }
       }, intervalTime); 
 
-      return () => clearInterval(interval)
+      return () => {
+        clearInterval(interval);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+      };
     } else if (count !== displayCount) {
       setDisplayCount(count);
+    }
+  }, [count, displayCount]);
+
+  const [showJumpButton, setShowJumpButton] = useState(false);
+
+  useEffect(() => {
+    if (count === displayCount) {
+      setShowJumpButton(false);
+    }
+    if (showJumpButton) {
+      return () => setShowJumpButton(false);
     }
   }, [count, displayCount])
 
@@ -330,6 +353,8 @@ export default function Home() {
         >
           Unwawa 3:
         </Button>
+        <Button    setShowJumpButton(true);
+  }, [count, displayCount])
       </div>
 
 
@@ -364,7 +389,7 @@ export default function Home() {
 
       <Sheet open={isMenuOpen} onOpenChange={toggleMenu}>
         <SheetTrigger asChild>
-          <div className="absolute left-4 top-4 z-50 cursor-pointer">
+          <div className="absolute right-4 top-4 z-50 cursor-pointer">
             <GiHamburgerMenu
               size={30}
               color={theme === "light" ? "white" : "black"}
