@@ -45,8 +45,18 @@ export default function Home() {
     }
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      document.title = `clickclick - ${count} wawas`;
+    }, 2000); // Update title every 2 seconds
+
+    // Cleanup the interval on unmount
+    return () => clearInterval(interval);
+  }, [count]);
+
+
   <Head>
-  <title>clickclick - {count} wawas</title>
+  <title>clickclick - loading wawas...</title>
 </Head>
 
   //shop stuff
