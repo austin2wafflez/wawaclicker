@@ -61,16 +61,36 @@ export default function Home() {
   const [botClicking, setBotClicking] = useState<number>(0);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
+    let intervalTimer: NodeJS.Timeout | null = null;
+    let wpsTimer: NodeJS.Timeout | null = null;
+    let countIncrement = 0;
+    // calculation shit
 
-    const interval = 10000 - (botClicking > 1 ? (botClicking - 1) * 1000 : 0);
+    const interval = Math.max(2500 - (botClicking * 100), 500);
+    // makes sure the minimum interval is .5 seconds so we dont get lightspeed wawa
+
     if (botClicking > 0) {
-      timer = setInterval(() => {
+      intervalTimer = setInterval(() => {
         setCount((prevCount) => prevCount + 1);
+        countIncrement++;
       }, interval);
+      // increases the clicking for how many bots there are
+
+      wpsTimer = setInterval(() => {
+        const actualWps = countIncrement / 10;
+        setWps(actualWps.toFixed(2));
+        countIncrement = 0;
+      }, 10000);
+      // calculates how many wawas are ACTUALLY being added over a 10 second period, then adds that
+      // number to the wps counter, rounding it to the nearest hundredth. not the quickest
+      // way to do it, but it works for now :p
     }
 
-    return () => { if (timer) clearInterval(timer); };
+    return () => {
+      if (intervalTimer) clearInterval(intervalTimer);
+      if (wpsTimer) clearInterval(wpsTimer)
+    };
+    // reset
 
   }, [botClicking]);
 
@@ -78,7 +98,7 @@ export default function Home() {
     if (count >= 30) {
       setCount(prevCount => prevCount - 30);
       setBotClicking(prevClicking => prevClicking + 1)
-      setWps(prevWps => (parseFloat(prevWps) + 0.1).toFixed(1))
+      //setWps(prevWps => (parseFloat(prevWps) + 0.25).toFixed(2))
       setBotBuyButtonText("Bought!");
       setTimeout(() => {
         setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
@@ -98,7 +118,7 @@ export default function Home() {
 
 
 
-  
+
 
 
 
@@ -115,7 +135,7 @@ export default function Home() {
           <span className={theme === "dark" ? "text-white" : ""}>{count}</span> times!</>
         )}
       </div>
-                <div className="text-xs text-gray-500">{wps} wawas per second</div>
+      <div className="text-xs text-gray-500">{wps} wawas per second</div>
 
 
       <div className="flex space-x-4 relative">
@@ -158,7 +178,7 @@ export default function Home() {
       <Sheet open={isMenuOpen} onOpenChange={toggleMenu}>
         <SheetTrigger asChild>
           <div className="absolute right-4 top-4 z-50 cursor-pointer">
-            <GiHamburgerMenu size={30} color={theme === "dark" ? 'white' : 'black'} />
+            <GiHamburgerMenu size={30} color={theme === "light" ? 'white' : 'black'} />
           </div>
         </SheetTrigger>
         <SheetContent side="top" className="bg-opacity-95 backdrop-blur-md" >
@@ -173,12 +193,9 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col gap-4 w-full h-70% justify-start items-right">
-          {/* this will handle the color changes */}
-          <Button className={`font-bold ${botButtonColor} text-white mr-4`} onClick={handleBuyButtonClick}>
-          {botBuyButtonText}
-        </Button>
-
-          
+            <Button className={`font-bold ${botButtonColor} text-white mr-4`} onClick={handleBuyButtonClick}>
+              {botBuyButtonText}
+            </Button>
           </div>
 
         </SheetContent>
