@@ -10,6 +10,11 @@ import { getCookie, setCookie } from "cookies-next";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { isMobile } from "react-device-detect";
+import Head from "next/head";
+
+      <Head>
+        <title>clickclick - {i need to make this work} wawas</title>
+      </Head>
 
 
 const Divider: React.FC = () => {
