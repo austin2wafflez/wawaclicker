@@ -12,9 +12,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { isMobile } from "react-device-detect";
 import Head from "next/head";
 
-      <Head>
-        <title>clickclick - {i need to make this work} wawas</title>
-      </Head>
+
 
 
 const Divider: React.FC = () => {
@@ -47,6 +45,9 @@ export default function Home() {
     }
   }, []);
 
+  <Head>
+  <title>clickclick - {count} wawas</title>
+</Head>
 
   //shop stuff
 
@@ -270,6 +271,7 @@ export default function Home() {
 
   //wawa count, wawacat, wawashop
 
+  
   return (
     <main
       className={`flex flex-col items-start justify-center min-h-screen p-4 ${theme === "dark"

@@ -1,0 +1,90 @@
+[debug] [2025-04-25T19:48:22.740Z] ----------------------------------------------------------------------
+[debug] [2025-04-25T19:48:22.752Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /nix/store/984bjqzf7prsischdc86jmqbn4ha5yxd-firebase-tools-14.2.0/lib/node_modules/firebase-tools/lib/bin/firebase.js deploy --only hosting
+[debug] [2025-04-25T19:48:22.753Z] CLI Version:   14.2.0
+[debug] [2025-04-25T19:48:22.754Z] Platform:      linux
+[debug] [2025-04-25T19:48:22.754Z] Node Version:  v20.18.1
+[debug] [2025-04-25T19:48:22.754Z] Time:          Fri Apr 25 2025 19:48:22 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-04-25T19:48:22.754Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-04-25T19:48:23.389Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-04-25T19:48:23.390Z] > authorizing via signed-in user (austin2wafflez@gmail.com)
+[debug] [2025-04-25T19:48:23.390Z] [iam] checking project wawa-clicker for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-04-25T19:48:23.393Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:23.393Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:23.396Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/wawa-clicker:testIamPermissions [none]
+[debug] [2025-04-25T19:48:23.396Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/wawa-clicker:testIamPermissions x-goog-quota-user=projects/wawa-clicker
+[debug] [2025-04-25T19:48:23.396Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/wawa-clicker:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-04-25T19:48:23.672Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/wawa-clicker:testIamPermissions 200
+[debug] [2025-04-25T19:48:23.672Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/wawa-clicker:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-04-25T19:48:23.674Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:23.674Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:23.675Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/wawa-clicker [none]
+[debug] [2025-04-25T19:48:23.856Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/wawa-clicker 200
+[debug] [2025-04-25T19:48:23.856Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/wawa-clicker {"projectId":"wawa-clicker","projectNumber":"91220978170","displayName":"Wawa Clicker","name":"projects/wawa-clicker","resources":{"hostingSite":"wawa-clicker"},"state":"ACTIVE","etag":"1_d0cd6082-1a8e-41ee-8f79-022311a29897"}
+[debug] [2025-04-25T19:48:30.021Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:30.021Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:30.023Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/wawa-clicker/sites pageToken=&pageSize=10
+[debug] [2025-04-25T19:48:30.807Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/wawa-clicker/sites 200
+[debug] [2025-04-25T19:48:30.810Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/wawa-clicker/sites {"sites":[{"name":"projects/wawa-clicker/sites/wawa-clicker","defaultUrl":"https://wawa-clicker.web.app","type":"DEFAULT_SITE"}]}
+[debug] [2025-04-25T19:48:30.812Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:30.812Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:30.813Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/wawa-clicker/sites 
+[debug] [2025-04-25T19:48:31.313Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/wawa-clicker/sites 200
+[debug] [2025-04-25T19:48:31.314Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/wawa-clicker/sites {"sites":[{"name":"projects/wawa-clicker/sites/wawa-clicker","defaultUrl":"https://wawa-clicker.web.app","type":"DEFAULT_SITE"}]}
+[debug] [2025-04-25T19:48:31.315Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:31.315Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:31.315Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/wawa-clicker/webApps/-/config [none]
+[debug] [2025-04-25T19:48:31.670Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/wawa-clicker/webApps/-/config 200
+[debug] [2025-04-25T19:48:31.672Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/wawa-clicker/webApps/-/config {"projectId":"wawa-clicker","storageBucket":"wawa-clicker.firebasestorage.app","apiKey":"AIzaSyAvPy_GBMgBLNlmGNaHQ-IrhmDhhpkWMKw","authDomain":"wawa-clicker.firebaseapp.com","messagingSenderId":"91220978170"}
+[info] 
+   Thank you for trying our early preview of Next.js support on Firebase Hosting.
+   During the preview, support is best-effort and breaking changes can be expected. Proceed with caution.
+   The integration is known to work with Next.js version 12 - 15.0. You may encounter errors.
+
+   Documentation: https://firebase.google.com/docs/hosting/frameworks/nextjs
+   File a bug: https://github.com/firebase/firebase-tools/issues/new?template=bug_report.md
+   Submit a feature request: https://github.com/firebase/firebase-tools/issues/new?template=feature_request.md
+
+   We'd love to learn from you. Express your interest in helping us shape the future of Firebase Hosting: https://goo.gle/41enW5X
+
+[debug] [2025-04-25T19:48:42.217Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:42.218Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:48:42.219Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/wawa-clicker/sites/wawa-clicker [none]
+[debug] [2025-04-25T19:48:42.818Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/wawa-clicker/sites/wawa-clicker 200
+[debug] [2025-04-25T19:48:42.819Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/wawa-clicker/sites/wawa-clicker {"name":"projects/wawa-clicker/sites/wawa-clicker","defaultUrl":"https://wawa-clicker.web.app","type":"DEFAULT_SITE"}
+[info]    ▲ Next.js 15.2.3
+
+[info]    - Environments: .env
+
+
+[info]    Creating an optimized production build ...
+
+[info] Failed to compile.
+
+
+[info] ./src/app/page.tsx
+Error:   x Unexpected token `Head`. Expected jsx identifier
+    ,-[/home/user/studio/src/app/page.tsx:15:1]
+ 12 | import { isMobile } from "react-device-detect";
+ 13 | import Head from "next/head";
+ 14 | 
+ 15 |       <Head>
+    :        ^^^^
+ 16 |         <title>clickclick - {i need to make this work} wawas</title>
+ 17 |       </Head>
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/page.tsx
+
+
+[info] 
+
+[info] > Build failed because of webpack errors
+
+[debug] [2025-04-25T19:49:01.175Z] Error: ENOENT: no such file or directory, open '/home/user/studio/.next/server/middleware-manifest.json'
+[error] 
+[error] Error: An unexpected error has occurred.
