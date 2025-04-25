@@ -1,21 +1,22 @@
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3278053743.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3639530951.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:502769164.
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:3208014068.
 "use client"
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image"; // Import Image
 import { getCookie, setCookie } from 'cookies-next';
-
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { GiHamburgerMenu } from 'react-icons/gi';
 
 export default function Home() {
   const [count, setCount] = useState<number>(() => {
     const storedCount = getCookie('wawas');
     return storedCount ? parseInt(storedCount as string, 10) : 0;
   });
+
+  const [wps, setWps] = useState<string>("0");
+  const [botBuyButtonText, setBotBuyButtonText] = useState("30W$ - wawabot3000 - buy nao!!!");
+  const [botButtonColor, setBotButtonColor] = useState("bg-green-500 hover:bg-green-600");
   enum WawaState {
     Normal = 'normal',
     Wawa = 'wawa',
@@ -40,7 +41,7 @@ export default function Home() {
     setWawaState(WawaState.Wawa);
     setTimeout(() => {
       setWawaState(WawaState.Normal);
-      
+
     }, 150);
   };
 
@@ -51,6 +52,56 @@ export default function Home() {
       setWawaState(WawaState.Normal);
     }
   };
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+  const [botClicking, setBotClicking] = useState<number>(0);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+
+    const interval = 10000 - (botClicking > 1 ? (botClicking - 1) * 1000 : 0);
+    if (botClicking > 0) {
+      timer = setInterval(() => {
+        setCount((prevCount) => prevCount + 1);
+      }, interval);
+    }
+
+    return () => { if (timer) clearInterval(timer); };
+
+  }, [botClicking]);
+
+  const handleBuyButtonClick = () => {
+    if (count >= 30) {
+      setCount(prevCount => prevCount - 30);
+      setBotClicking(prevClicking => prevClicking + 1)
+      setWps(prevWps => (parseFloat(prevWps) + 0.1).toFixed(1))
+      setBotBuyButtonText("Bought!");
+      setTimeout(() => {
+        setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
+      }, 1000);
+      setBotButtonColor("bg-green-500 hover:bg-green-600");
+    } else {
+      setBotBuyButtonText("Too Expensive 3:");
+      setBotButtonColor("bg-red-500 hover:bg-red-600");
+      setTimeout(() => {
+        setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
+        setBotButtonColor("bg-green-500 hover:bg-green-600");
+      }, 1000);
+
+
+    }
+  }
+
+
+
+  
+
+
+
   return (
     <main className={`flex flex-col items-start justify-center min-h-screen p-4 ${theme === "dark" ? "bg-blue-950 text-white" : "bg-white text-black"}`}>
 
@@ -64,6 +115,9 @@ export default function Home() {
           <span className={theme === "dark" ? "text-white" : ""}>{count}</span> times!</>
         )}
       </div>
+                <div className="text-xs text-gray-500">{wps} wawas per second</div>
+
+
       <div className="flex space-x-4 relative">
         <Button variant="default" className={`text-lg md:text-xl p-6 rounded-full transition-transform active:scale-95 ${theme === "dark" ? "bg-white text-black" : "bg-gray-400 text-white"}`} onClick={incrementCount}>
           Wawa :3
@@ -72,6 +126,7 @@ export default function Home() {
           Unwawa 3:
         </Button>
       </div>
+
       <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
         {wawaState === WawaState.Wawa ? (
           <Image
@@ -98,6 +153,39 @@ export default function Home() {
             height={500}
           />
         )}
+      </div>
+
+      <Sheet open={isMenuOpen} onOpenChange={toggleMenu}>
+        <SheetTrigger asChild>
+          <div className="absolute right-4 top-4 z-50 cursor-pointer">
+            <GiHamburgerMenu size={30} color={theme === "dark" ? 'white' : 'black'} />
+          </div>
+        </SheetTrigger>
+        <SheetContent side="top" className="bg-opacity-95 backdrop-blur-md" >
+          <div className="w-full flex justify-center items-center">
+            <h4 className="font-bold text-xl text-white p-2">
+              The Shoppe~
+            </h4></div>
+
+          <div>
+            /br
+            /br
+          </div>
+
+          <div className="flex flex-col gap-4 w-full h-70% justify-start items-right">
+          {/* this will handle the color changes */}
+          <Button className={`font-bold ${botButtonColor} text-white mr-4`} onClick={handleBuyButtonClick}>
+          {botBuyButtonText}
+        </Button>
+
+          
+          </div>
+
+        </SheetContent>
+
+      </Sheet>
+
+      <div className={`transition-opacity ${isMenuOpen ? 'opacity-50' : 'opacity-100'}`}>
       </div>
     </main>
   );
