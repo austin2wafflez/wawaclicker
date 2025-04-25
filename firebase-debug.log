@@ -1,0 +1,52 @@
+[debug] [2025-04-25T19:30:34.029Z] ----------------------------------------------------------------------
+[debug] [2025-04-25T19:30:34.034Z] Command:       /nix/store/ixbb20farqh1f4fqbmsn6b1ixn8mc8ij-nodejs-20.18.1/bin/node /nix/store/984bjqzf7prsischdc86jmqbn4ha5yxd-firebase-tools-14.2.0/lib/node_modules/firebase-tools/lib/bin/firebase.js init hosting
+[debug] [2025-04-25T19:30:34.035Z] CLI Version:   14.2.0
+[debug] [2025-04-25T19:30:34.035Z] Platform:      linux
+[debug] [2025-04-25T19:30:34.035Z] Node Version:  v20.18.1
+[debug] [2025-04-25T19:30:34.035Z] Time:          Fri Apr 25 2025 19:30:34 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-04-25T19:30:34.036Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-04-25T19:30:34.048Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-04-25T19:30:34.049Z] > authorizing via signed-in user (austin2wafflez@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /home/user/studio
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-04-25T19:30:40.838Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:30:40.840Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:30:40.851Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2025-04-25T19:30:41.294Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-04-25T19:30:41.295Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[info] i  Using project wawa-clicker (Wawa Clicker) 
+[info] 
+=== Hosting Setup
+[debug] [2025-04-25T19:30:43.033Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:30:43.033Z] Checked if tokens are valid: true, expires at: 1745612231053
+[debug] [2025-04-25T19:30:43.033Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/wawa-clicker [none]
+[debug] [2025-04-25T19:30:43.172Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/wawa-clicker 200
+[debug] [2025-04-25T19:30:43.173Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/wawa-clicker {"projectId":"wawa-clicker","projectNumber":"91220978170","displayName":"Wawa Clicker","name":"projects/wawa-clicker","resources":{"hostingSite":"wawa-clicker"},"state":"ACTIVE","etag":"1_d0cd6082-1a8e-41ee-8f79-022311a29897"}
+[debug] [2025-04-25T19:31:39.235Z] Error: Command failed: npx --yes create-next-app@"12 - 15.0" -e hello-world /home/user/studio/src --use-npm --ts
+    at genericNodeError (node:internal/errors:984:15)
+    at wrappedFn (node:internal/errors:538:14)
+    at checkExecSyncError (node:child_process:891:11)
+    at execSync (node:child_process:963:15)
+    at Object.init (/nix/store/984bjqzf7prsischdc86jmqbn4ha5yxd-firebase-tools-14.2.0/lib/node_modules/firebase-tools/lib/frameworks/next/index.js:214:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async doSetup (/nix/store/984bjqzf7prsischdc86jmqbn4ha5yxd-firebase-tools-14.2.0/lib/node_modules/firebase-tools/lib/init/features/hosting/index.js:120:13)
+    at async init (/nix/store/984bjqzf7prsischdc86jmqbn4ha5yxd-firebase-tools-14.2.0/lib/node_modules/firebase-tools/lib/init/index.js:41:9)
+[error] 
+[error] Error: An unexpected error has occurred.
