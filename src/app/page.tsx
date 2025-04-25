@@ -1,6 +1,6 @@
 "use client"
 import { Button, ButtonProps } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useEffect } from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image"; // Import Image
@@ -8,16 +8,27 @@ import { getCookie, setCookie } from 'cookies-next';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { GiHamburgerMenu } from 'react-icons/gi';
 
+
+
+const Divider: React.FC = () => {
+  return <div style={{ height: '13px', visibility: 'hidden' }} />;
+};
+
 export default function Home() {
   const [count, setCount] = useState<number>(() => {
     const storedCount = getCookie('wawas');
     return storedCount ? parseInt(storedCount as string, 10) : 0;
   });
+  const [displayCount, setDisplayCount] = useState<number>(count);
 
   const [wps, setWps] = useState<string>("0");
   const [botBuyButtonText, setBotBuyButtonText] = useState("30W$ - wawabot3000 - buy nao!!!");
   const [botButtonColor, setBotButtonColor] = useState("bg-green-500 hover:bg-green-600");
+  const [forumBuyButtonText, setForumBuyButtonText] = useState("150W$ - ask for wawas on forum - buy nao!!!");
+  const [forumButtonColor, setForumButtonColor] = useState("bg-green-500 hover:bg-green-600");
   enum WawaState {
+
+
     Normal = 'normal',
     Wawa = 'wawa',
     Unwawa = 'unwawa',
@@ -32,6 +43,7 @@ export default function Home() {
   }, [count]);
 
   const incrementCount = () => {
+
     setCount(prevCount => prevCount + 1);
 
     if (wawaState === WawaState.Unwawa) {
@@ -45,7 +57,30 @@ export default function Home() {
     }, 150);
   };
 
+  const [last5SecondsCounts, setLast5SecondsCounts] = useState<number[]>([]);
+
+  const artiCount = () => {
+    
+    setCount(prevCount => prevCount + 1);
+    setLast5SecondsCounts(prevCounts => [...prevCounts, Date.now()]);
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    const updateCounts = () => {
+      const now = Date.now();
+        setLast5SecondsCounts(prevCounts => prevCounts.filter(time => now - time <= 10000));
+    };
+
+    updateCounts(); // Initial cleanup
+    interval = setInterval(updateCounts, 1000);
+
+    return () => interval && clearInterval(interval);
+  }, []);
+
   const deincrementCount = () => {
+    
     setWawaState(WawaState.Unwawa);
     setCount(prevCount => prevCount - 1);
     if (wawaState === WawaState.Recover) {
@@ -58,47 +93,75 @@ export default function Home() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  const [botClicking, setBotClicking] = useState<number>(0);
+
+  const [botClicking, setBotClicking] = useState<number>(() => {
+    const storedBotCount = getCookie('wawabots');
+    return storedBotCount ? parseInt(storedBotCount as string, 10) : 0;
+  });
+
+  const [forumClicking, setForumClicking] = useState<number>(() => {
+    const storedForumCount = getCookie('wawaforums');
+    return storedForumCount ? parseInt(storedForumCount as string, 10) : 0;
+
+  });
+
 
   useEffect(() => {
     let intervalTimer: NodeJS.Timeout | null = null;
-    let wpsTimer: NodeJS.Timeout | null = null;
-    let countIncrement = 0;
-    // calculation shit
 
-    const interval = Math.max(2500 - (botClicking * 100), 500);
-    // makes sure the minimum interval is .5 seconds so we dont get lightspeed wawa
+    const botInterval = Math.max(2500 - (botClicking * 100), 500);
+    //makes sure the minimum interval is .5 seconds so we dont get lightspeed wawa
 
     if (botClicking > 0) {
       intervalTimer = setInterval(() => {
-        setCount((prevCount) => prevCount + 1);
-        countIncrement++;
-      }, interval);
-      // increases the clicking for how many bots there are
-
-      wpsTimer = setInterval(() => {
-        const actualWps = countIncrement / 10;
-        setWps(actualWps.toFixed(2));
-        countIncrement = 0;
-      }, 10000);
-      // calculates how many wawas are ACTUALLY being added over a 10 second period, then adds that
-      // number to the wps counter, rounding it to the nearest hundredth. not the quickest
-      // way to do it, but it works for now :p
+        artiCount();
+      }, botInterval);
     }
 
     return () => {
       if (intervalTimer) clearInterval(intervalTimer);
-      if (wpsTimer) clearInterval(wpsTimer)
     };
     // reset
 
   }, [botClicking]);
 
-  const handleBuyButtonClick = () => {
+  useEffect(() => {
+    let intervalTimer: NodeJS.Timeout | null = null;
+
+    if (forumClicking > 0) {
+      intervalTimer = setInterval(() => {
+        artiCount();
+        artiCount();
+      }, Math.max(1000 - forumClicking * 90, 100)); // click twice every second initially, decreases every integer added to forum clicking, minimum of 100ms
+    }
+
+    return () => {
+      if (intervalTimer) clearInterval(intervalTimer);
+
+    };
+  }, [forumClicking]);
+
+  useEffect(() => {
+    setCookie('wawaforums', forumClicking.toString());
+  }, [forumClicking]);
+
+  useEffect(() => {
+    setCookie('wawabots', botClicking.toString());
+  }, [botClicking]);
+
+  useEffect(() => {
+    const countInLast5Seconds = last5SecondsCounts.length;
+    const wpsValue = countInLast5Seconds / 10;
+    const roundedWps = wpsValue.toFixed(2);
+    setWps(roundedWps);
+  }, [last5SecondsCounts]);
+
+
+
+  const handleBotBuyButtonClick = () => {
     if (count >= 30) {
       setCount(prevCount => prevCount - 30);
       setBotClicking(prevClicking => prevClicking + 1)
-      //setWps(prevWps => (parseFloat(prevWps) + 0.25).toFixed(2))
       setBotBuyButtonText("Bought!");
       setTimeout(() => {
         setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
@@ -111,10 +174,48 @@ export default function Home() {
         setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
         setBotButtonColor("bg-green-500 hover:bg-green-600");
       }, 1000);
-
-
     }
   }
+
+  const handleForumBuyButtonClick = () => {
+    if (count >= 150) {
+      setCount(prevCount => prevCount - 150);
+      setForumClicking(prevClicking => prevClicking + 1)
+      setForumBuyButtonText("Bought!");
+      setTimeout(() => {
+        setForumBuyButtonText("150W$ - ask for wawas on forum - buy nao!!!");
+      }, 1000);
+      setForumButtonColor("bg-green-500 hover:bg-green-600");
+    } else {
+      setForumBuyButtonText("Too Expensive 3:");
+      setForumButtonColor("bg-red-500 hover:bg-red-600");
+      setTimeout(() => {
+        setForumBuyButtonText("150W$ - ask for wawas on forum - buy nao!!!");
+        setForumButtonColor("bg-green-500 hover:bg-green-600");
+      }, 1000);
+    }
+  }
+
+  useEffect(() => {
+    if (Math.abs(count - displayCount) > 1) {
+        const interval = setInterval(() => {
+            setDisplayCount(prevDisplayCount => {
+                if (prevDisplayCount < count) {
+                    return prevDisplayCount + 1;
+                } else if (prevDisplayCount > count) {
+                    return prevDisplayCount - 1;
+                } else {
+                    clearInterval(interval); // stop the interval if counts are equal
+                    return prevDisplayCount;
+                }
+            });
+        }, 95); // adjust the time it takes to count in milliseconds - less = faster count up
+
+        return () => clearInterval(interval);
+    } else if (count !== displayCount) {
+        setDisplayCount(count);
+    }
+}, [count, displayCount]);
 
 
 
@@ -128,11 +229,11 @@ export default function Home() {
       <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-8 ${theme === "dark" ? "text-white" : ""}`}>
         You have wawa'd
       </h1>
-      <div className="text-6xl md:text-7xl lg:text-8xl font-semibold mb-12">
-        {count < 0 ? (
-          <span className="text-red-500">{count} times...</span>
+      <div className="text-6xl md:text-7xl lg:text-8xl font-semibold mb-12 transition-all duration-500">
+        {displayCount < 0 ? (
+          <span className="text-red-500">{displayCount} times...</span>
         ) : (<>
-          <span className={theme === "dark" ? "text-white" : ""}>{count}</span> times!</>
+          <span className={theme === "dark" ? "text-white" : ""}>{displayCount}</span> times!</>
         )}
       </div>
       <div className="text-xs text-gray-500">{wps} wawas per second</div>
@@ -177,7 +278,7 @@ export default function Home() {
 
       <Sheet open={isMenuOpen} onOpenChange={toggleMenu}>
         <SheetTrigger asChild>
-          <div className="absolute right-4 top-4 z-50 cursor-pointer">
+          <div className="absolute left-4 top-4 z-50 cursor-pointer">
             <GiHamburgerMenu size={30} color={theme === "light" ? 'white' : 'black'} />
           </div>
         </SheetTrigger>
@@ -193,8 +294,14 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col gap-4 w-full h-70% justify-start items-right">
-            <Button className={`font-bold ${botButtonColor} text-white mr-4`} onClick={handleBuyButtonClick}>
+            <Button className={`font-bold ${botButtonColor} text-white mr-4`} onClick={handleBotBuyButtonClick}>
               {botBuyButtonText}
+            </Button>
+          </div>
+          <Divider />
+          <div className="flex flex-col gap-4 w-full h-70% justify-start items-right">
+            <Button className={`font-bold ${forumButtonColor} text-white mr-4`} onClick={handleForumBuyButtonClick}>
+              {forumBuyButtonText}
             </Button>
           </div>
 
