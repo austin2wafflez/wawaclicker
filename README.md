@@ -1,5 +1,3 @@
-# Firebase Studio
+this isnt uhh
 
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
+go to src/app/page.tsx to see the magical wawa

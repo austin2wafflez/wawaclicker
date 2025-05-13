@@ -11,6 +11,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { isMobile } from "react-device-detect";
 import Head from "next/head";
+import { motion } from "framer-motion";
+
 
 <Head>
 <title>clickclick - loading wawas...</title>
@@ -30,8 +32,8 @@ export default function Home() {
     return storedCount ? parseInt(storedCount as string, 10) : 0;
   });
 
-  const [displayCount, setDisplayCount] = useState<number>(count);
   const [wps, setWps] = useState<string>("0");
+  const [flashRed, setFlashRed] = useState(false);
 
   useEffect(() => {
     let alertShown = false;
@@ -44,6 +46,7 @@ export default function Home() {
         window.alert("data loaded :3");
         }
         alertShown = true
+        
       }
     }
   }, []);
@@ -51,12 +54,11 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       document.title = `clickclick - ${count} wawas`;
-    }, 500); // Update title every half a second
+    }, 10); // Update title every hundredth a second
 
     // cleanup the interval on unmount
     return () => clearInterval(interval);
   }, [count]);
-
 
 
   //shop stuff
@@ -131,10 +133,28 @@ export default function Home() {
 
   const deincrementCount = () => {
     setWawaState(WawaState.Unwawa)
-    setCount((prevCount) => prevCount - 1)
+    setCount((prevCount) => {
+      const newCount = prevCount - 1;
+      if (newCount < prevCount) { // Check if count actually decreased
+      }
+      return newCount;
+    })
+
     if (wawaState === WawaState.Recover) {
       setWawaState(WawaState.Normal)
     }
+  };
+
+  const ouch = () => {
+    setWawaState(WawaState.Unwawa)
+    setFlashRed(true);
+    setTimeout(() => setFlashRed(false), 500);
+  };
+
+  const ouchBuy = () => {
+    setWawaState(WawaState.Wawa)
+    setFlashRed(true);
+    setTimeout(() => setFlashRed(false), 500);
   };
 
   // menu stuff
@@ -178,14 +198,14 @@ export default function Home() {
   useEffect(() => {
     let intervalTimer: NodeJS.Timeout | null = null;
 
+    // don't click twice at the same time, spread clicking over alotted time in ms
+    const forumInterval = Math.max(500 - (forumClicking * 45), 50);
+
     if (forumClicking > 0) {
       intervalTimer = setInterval(() => {
         artiCount();
-        artiCount();
-      }, Math.max(1000 - forumClicking * 90, 100)); // click twice every second initially, decreases every integer added to forum clicking, minimum of 100ms
-    }
-    return () => {
-      if (intervalTimer) clearInterval(intervalTimer);
+        setTimeout(() => artiCount(), forumInterval);
+      }, forumInterval * 2);
     }
   }, [forumClicking]);
 
@@ -204,9 +224,15 @@ export default function Home() {
   useEffect(() => {
     const countInLast5Seconds = last5SecondsCounts.length;
     const wpsValue = countInLast5Seconds / 10;
-    const roundedWps = wpsValue.toFixed(2);
-    setWps(roundedWps);
-  }, [last5SecondsCounts]);
+    const currentWps = wpsValue.toFixed(2);
+    setWps((prevWps) => {
+      const prevWpsNum = parseFloat(prevWps);
+      const currentWpsNum = parseFloat(currentWps);
+      // keep the highest value on display
+      return currentWpsNum > prevWpsNum ? currentWps : prevWps;
+    });
+
+  }, [last5SecondsCounts, wps]);
 
   //Buttons
 
@@ -215,6 +241,7 @@ export default function Home() {
       setCount((prevCount) => prevCount - 30);
       setBotClicking((prevClicking) => prevClicking + 1)
       setBotBuyButtonText("Bought!");
+      ouchBuy();
       setTimeout(() => {
         setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
       }, 1000)
@@ -234,6 +261,7 @@ export default function Home() {
       setCount((prevCount) => prevCount - 150);
       setForumClicking((prevClicking) => prevClicking + 1)
       setForumBuyButtonText("Bought!");
+      ouchBuy();
       setTimeout(() => {
         setForumBuyButtonText("150W$ - ask for wawas on forum - buy nao!!!");
       }, 1000);
@@ -248,59 +276,8 @@ export default function Home() {
     }
   }
 
-  //make numbers act cool
-  useEffect(() => {
-    if (Math.abs(count - displayCount) > 1) {
-      let timeoutId: NodeJS.Timeout | null = null;
-      let intervalTime;
-      const difference = Math.abs(count - displayCount);
-      if (difference > 1000) {
-          intervalTime = 3; // Very fast for large differences
-      } else if (difference > 100) {
-          intervalTime = 25; // Faster for moderately large differences
-      } else {
-          intervalTime = 55; // Slower for smaller differences
-      }
-      const interval = setInterval(() => {
-        setDisplayCount((prevDisplayCount) => {
-          if (prevDisplayCount < count) {
-            return prevDisplayCount + 1;
-          } else if (prevDisplayCount > count) {
-            return prevDisplayCount - 1;
-          } else {
-            clearInterval(interval) // stop the interval if counts are equal
-            return prevDisplayCount;
-          }
-        });
 
-        if (!timeoutId) {
-          timeoutId = setTimeout(() => {
-            setShowJumpButton(true);
-          }, 5000);
-        }
-      }, intervalTime); 
 
-      return () => {
-        clearInterval(interval);
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-      };
-    } else if (count !== displayCount) {
-      setDisplayCount(count);
-    }
-  }, [count, displayCount]);
-
-  const [showJumpButton, setShowJumpButton] = useState(false);
-
-  useEffect(() => {
-    if (count === displayCount) {
-      setShowJumpButton(false);
-    }
-    if (showJumpButton) {
-      return () => setShowJumpButton(false);
-    }
-  }, [count, displayCount])
 
   //wawa count, wawacat, wawashop
 
@@ -316,19 +293,26 @@ export default function Home() {
         className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-8 ${theme === "dark" ? "text-white" : ""
           }`}
       >
-        You have wawa'd
+        (hi gobble!!!) You have wawa'd 
       </h1>
-      <div
-        className="text-6xl md:text-7xl lg:text-8xl font-semibold mb-12 transition-all duration-500"
+      <motion.div
+        className={`text-6xl md:text-7xl lg:text-8xl font-semibold mb-12 transition-all duration-500 ${flashRed ? 'text-red-500 animate-bounce' : ''
+          }`}
+        animate={flashRed ? { y: [0, -10, 0] } : {}}
+        transition={flashRed ? { duration: 0.5, repeat: 0 } : {}}
       >
-        {displayCount < 0 ? (
-          <span className="text-red-500">{displayCount} times...</span>
+        {count < 0 ? (
+          <span className="text-red-500">{count} times...</span>
         ) : (
           <>
-            <span className={theme === "dark" ? "text-white" : ""}>{displayCount}</span> times!
+            <span className={theme === "dark" ? "text-white" : ""}>
+              {count}
+            </span> times!
           </>
+
+
         )}
-      </div>
+        </motion.div>
        <div className="w-full flex justify-left">
       <div className="text-xs text-gray-500">{wps} wawas per second</div>
             </div>
@@ -349,17 +333,18 @@ export default function Home() {
         <Button
           variant={theme === "dark" ? "secondary" : "destructive"}
           className={`text-lg md:text-xl p-6 rounded-full transition-transform active:scale-95 ${theme === "dark" ? "bg-blue-400 text-white" : ""}`}
-          onClick={deincrementCount}
-        >
+          onClick={deincrementCount}>
           Unwawa 3:
         </Button>
-        <Button    setShowJumpButton(true);
-  }, [count, displayCount])
       </div>
 
 
 
-      <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
+      <div className={
+            isMobile
+              ? "absolute top-0 left-1/2 -translate-x-1/2"
+              : "absolute right-0 top-1/2 transform -translate-y-1/2"
+          }>
         {wawaState === WawaState.Wawa ? (
           <Image
             src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png"
@@ -435,6 +420,9 @@ export default function Home() {
           }`}
       >
       </div>
+    
+
     </main>
   );
 }
+
