@@ -293,7 +293,7 @@ export default function Home() {
         className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-8 ${theme === "dark" ? "text-white" : ""
           }`}
       >
-        (hi gobble!!!) You have wawa'd 
+        You have wawa'd 
       </h1>
       <motion.div
         className={`text-6xl md:text-7xl lg:text-8xl font-semibold mb-12 transition-all duration-500 ${flashRed ? 'text-red-500 animate-bounce' : ''
@@ -415,12 +415,21 @@ export default function Home() {
         </SheetContent>
       </Sheet>
 
-      <div
-        className={`transition-opacity ${isMenuOpen ? "opacity-50" : "opacity-100"
-          }`}
-      >
-      </div>
-    
+        <SheetTrigger asChild>
+          <div className="absolute right-4 top-4 z-50 cursor-pointer flex items-center space-x-2">
+            <a href="https://austin2wafflez.github.io/wawaclicker/changelog.html" target="_blank" rel="noopener noreferrer">
+              <GiHamburgerMenu
+                size={30}
+                color={theme === "light" ? "white" : "black"}
+              />
+            </a>
+            <GiHamburgerMenu // Placeholder for page icon
+              size={30}
+              color={theme === "light" ? "white" : "black"}
+            />
+          </div>
+        </SheetTrigger>
+
 
     </main>
   );
