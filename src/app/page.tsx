@@ -8,11 +8,11 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import { getCookie, setCookie } from "cookies-next";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { GiHamburgerMenu } from "react-icons/gi";
+import { FaShoppingCart } from "react-icons/fa";
 import { isMobile } from "react-device-detect";
 import Head from "next/head";
 import { motion } from "framer-motion";
-
+import { FiFileText } from "react-icons/fi";
 
 <Head>
 <title>clickclick - loading wawas...</title>
@@ -375,7 +375,7 @@ export default function Home() {
       <Sheet open={isMenuOpen} onOpenChange={toggleMenu}>
         <SheetTrigger asChild>
           <div className="absolute right-4 top-4 z-50 cursor-pointer">
-            <GiHamburgerMenu
+            <FaShoppingCart
               size={30}
               color={theme === "light" ? "white" : "black"}
             />
@@ -413,25 +413,27 @@ export default function Home() {
             </Button>
           </div>
         </SheetContent>
-      </Sheet>
 
-        <SheetTrigger asChild>
+      <SheetTrigger asChild>
           <div className="absolute right-4 top-4 z-50 cursor-pointer flex items-center space-x-2">
             <a href="https://austin2wafflez.github.io/wawaclicker/changelog.html" target="_blank" rel="noopener noreferrer">
-              <GiHamburgerMenu
+              <FiFileText
                 size={30}
                 color={theme === "light" ? "white" : "black"}
               />
             </a>
-            <GiHamburgerMenu // Placeholder for page icon
+            <FaShoppingCart
               size={30}
-              color={theme === "light" ? "white" : "black"}
+              color={theme === "light" ? "black" : "black"}
+              onClick={toggleMenu}
             />
           </div>
         </SheetTrigger>
+        </Sheet>
+</main>
 
-
-    </main>
+    
   );
 }
 
+      
