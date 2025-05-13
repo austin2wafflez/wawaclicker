@@ -349,9 +349,9 @@ export default function Home() {
 
 
       <div className={
-        isMobile
-          ? "absolute top-0 left-1/2 -translate-x-1/2"
-          : "absolute right-0 top-1/2 transform -translate-y-1/2"
+        isMobile || count < 0 || (typeof window !== 'undefined' && window.innerWidth < 906)
+          ? "absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500" 
+          : "absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500"
       }>
         {wawaState === WawaState.Wawa ? (
           <Image
