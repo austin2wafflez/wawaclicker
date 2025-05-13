@@ -2,6 +2,7 @@
   "name": "nextn",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
@@ -43,7 +44,7 @@
     "date-fns": "^3.6.0",
     "firebase": "^11.3.0",
     "framer": "^2.4.1",
-    "framer-motion": "^12.11.0",
+    "framer-motion": "^10.18.0",
     "genkit": "^1.0.4",
     "lucide-react": "^0.475.0",
     "next": "15.2.3",

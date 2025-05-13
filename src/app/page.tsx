@@ -1,3 +1,4 @@
+
 "use client";
 
 //importing
@@ -9,13 +10,14 @@ import Image from "next/image";
 import { getCookie, setCookie } from "cookies-next";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { FaShoppingCart } from "react-icons/fa";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { isMobile } from "react-device-detect";
 import Head from "next/head";
 import { motion } from "framer-motion";
 import { FiFileText } from "react-icons/fi";
 
 <Head>
-<title>clickclick - loading wawas...</title>
+  <title>clickclick - loading wawas...</title>
 </Head>
 
 
@@ -40,13 +42,13 @@ export default function Home() {
     const storedCount = getCookie('wawas');
     if (storedCount) {
       if (!alertShown) {
-      if (isMobile) {
-        toast.success("data loaded :3");
-      } else {
-        window.alert("data loaded :3");
+        if (isMobile) {
+          toast.success("data loaded :3");
+        } else {
+          window.alert("data loaded :3");
         }
         alertShown = true
-        
+
       }
     }
   }, []);
@@ -161,6 +163,7 @@ export default function Home() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const [changelogOpen, setChangelogOpen] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -281,19 +284,19 @@ export default function Home() {
 
   //wawa count, wawacat, wawashop
 
-  
+
   return (
     <main
       className={`flex flex-col items-start justify-center min-h-screen p-4 ${theme === "dark"
-          ? "bg-blue-950 text-white"
-          : "bg-white text-black"
+        ? "bg-blue-950 text-white"
+        : "bg-white text-black"
         }`}
     >
       <h1
         className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-8 ${theme === "dark" ? "text-white" : ""
           }`}
       >
-        You have wawa'd 
+        You have wawa'd
       </h1>
       <motion.div
         className={`text-6xl md:text-7xl lg:text-8xl font-semibold mb-12 transition-all duration-500 ${flashRed ? 'text-red-500 animate-bounce' : ''
@@ -312,10 +315,10 @@ export default function Home() {
 
 
         )}
-        </motion.div>
-       <div className="w-full flex justify-left">
-      <div className="text-xs text-gray-500">{wps} wawas per second</div>
-            </div>
+      </motion.div>
+      <div className="w-full flex justify-left">
+        <div className="text-xs text-gray-500">{wps} wawas per second</div>
+      </div>
 
 
 
@@ -323,8 +326,8 @@ export default function Home() {
         <Button
           variant="default"
           className={`text-lg md:text-xl p-6 rounded-full transition-transform active:scale-95 ${theme === "dark"
-              ? "bg-white text-black"
-              : "bg-gray-400 text-white"
+            ? "bg-white text-black"
+            : "bg-gray-400 text-white"
             }`}
           onClick={incrementCount}
         >
@@ -341,10 +344,10 @@ export default function Home() {
 
 
       <div className={
-            isMobile
-              ? "absolute top-0 left-1/2 -translate-x-1/2"
-              : "absolute right-0 top-1/2 transform -translate-y-1/2"
-          }>
+        isMobile
+          ? "absolute top-0 left-1/2 -translate-x-1/2"
+          : "absolute right-0 top-1/2 transform -translate-y-1/2"
+      }>
         {wawaState === WawaState.Wawa ? (
           <Image
             src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png"
@@ -414,26 +417,25 @@ export default function Home() {
           </div>
         </SheetContent>
 
-      <SheetTrigger asChild>
-          <div className="absolute right-4 top-4 z-50 cursor-pointer flex items-center space-x-2">
-            <a href="https://austin2wafflez.github.io/wawaclicker/changelog.html" target="_blank" rel="noopener noreferrer">
-              <FiFileText
-                size={30}
-                color={theme === "light" ? "white" : "black"}
-              />
-            </a>
-            <FaShoppingCart
-              size={30}
-              color={theme === "light" ? "black" : "black"}
-              onClick={toggleMenu}
-            />
-          </div>
-        </SheetTrigger>
-        </Sheet>
-</main>
 
-    
+        <DropdownMenu open={changelogOpen} onOpenChange={setChangelogOpen}>
+          <DropdownMenuTrigger asChild>
+            <SheetTrigger asChild>
+              <div className="absolute right-9 top-4 z-50 cursor-pointer flex items-center space-x-2">
+                <FiFileText
+                  size={30}
+                  color={theme === "light" ? "white" : "black"}
+                />
+              </div>
+            </SheetTrigger>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="p-0 w-80 h-96">
+            <iframe src="https://austin2wafflez.github.io/wawaclicker/changelog.html" className="w-full h-full border-0"></iframe>
+          </DropdownMenuContent>
+
+        </DropdownMenu>
+      </Sheet>
+    </main>
   );
 }
 
-      
