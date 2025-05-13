@@ -15,6 +15,7 @@ import { isMobile } from "react-device-detect";
 import Head from "next/head";
 import { motion } from "framer-motion";
 import { FiFileText } from "react-icons/fi";
+import { FaCog } from "react-icons/fa";
 
 <Head>
   <title>clickclick - loading wawas...</title>
@@ -167,8 +168,12 @@ export default function Home() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const toggleSettings = () => {
+    setIsSettingsOpen(!isSettingsOpen)
+  };
 
-  // autoclickers
+
 
   const [botClicking, setBotClicking] = useState<number>(() => {
     const storedBotCount = getCookie('wawabots');
@@ -384,7 +389,7 @@ export default function Home() {
             />
           </div>
         </SheetTrigger>
-        <SheetContent side="top" className="bg-opacity-95 backdrop-blur-md">
+        <SheetContent side="right" className="bg-opacity-95 backdrop-blur-md">
           <div className="w-full flex justify-center items-center">
             <h4 className="font-bold text-xl text-white p-2">The Shoppe~</h4>
           </div>
@@ -417,11 +422,10 @@ export default function Home() {
           </div>
         </SheetContent>
 
-
         <DropdownMenu open={changelogOpen} onOpenChange={setChangelogOpen}>
           <DropdownMenuTrigger asChild>
             <SheetTrigger asChild>
-              <div className="absolute right-9 top-4 z-50 cursor-pointer flex items-center space-x-2">
+              <div className="absolute right-12 top-4 z-50 cursor-pointer flex items-center space-x-2">
                 <FiFileText
                   size={30}
                   color={theme === "light" ? "white" : "black"}
@@ -429,12 +433,29 @@ export default function Home() {
               </div>
             </SheetTrigger>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="p-0 w-80 h-96">
-            <iframe src="https://austin2wafflez.github.io/wawaclicker/changelog.html" className="w-full h-full border-0"></iframe>
+          <DropdownMenuContent className="p-0 w-250 h-400">
+            <iframe src="https://austin2wafflez.github.io/wawaclicker/changelog.html" className="w-500 h-150 border-0"></iframe>
           </DropdownMenuContent>
-
         </DropdownMenu>
       </Sheet>
+      
+      <Sheet open={isSettingsOpen} onOpenChange={toggleSettings}>
+        <SheetTrigger asChild>
+          <div className="absolute right-22 top-4 z-50 cursor-pointer">
+            <FaCog
+              size={30}
+              color={theme === "light" ? "white" : "black"}
+            />
+          </div>
+        </SheetTrigger>
+        <SheetContent side="left" className="bg-opacity-95 backdrop-blur-md">
+          <div className="w-full flex justify-center items-center">
+            <h4 className="font-bold text-xl text-white p-2">Settoing</h4>
+          </div>
+
+        </SheetContent>
+        </Sheet>
+
     </main>
   );
 }
