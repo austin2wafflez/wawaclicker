@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Tap Counter',
-  description: 'A simple tap counter app',
+  title: 'Wawa Clicker',
+  description: 'A simple clicker counter app :3',
 };
 
 export default function RootLayout({

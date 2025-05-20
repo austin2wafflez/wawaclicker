@@ -10,9 +10,8 @@ import Image from "next/image";
 import { getCookie, setCookie } from "cookies-next";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { FaShoppingCart } from "react-icons/fa";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"; // DropdownMenuItem not used directly
-import { isMobile as isMobileDevice } from "react-device-detect"; // Renamed to avoid conflict
-// Head component is not used in App Router pages like this, metadata is preferred.
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { isMobile as isMobileDevice } from "react-device-detect"; 
 import { motion } from "framer-motion";
 import { FiFileText } from "react-icons/fi";
 import { FaCog } from "react-icons/fa";
@@ -23,50 +22,52 @@ const Divider: React.FC = () => {
 
 export default function Home() {
     const [isClient, setIsClient] = useState(false);
-    const [count, setCount] = useState<number>(0); // Initialized to 0, will be updated from cookie on client
+    const [count, setCount] = useState<number>(0); // initialized to 0, will be updated from cookie on client
     const [wps, setWps] = useState<string>("0");
     const [flashRed, setFlashRed] = useState(false);
-    const [testing, setTesting] = useState(false); // Default to false, updated on client
+    const [testing, setTesting] = useState(false); // default to false, updated on client
 
     const { theme, setTheme } = useTheme();
 
-    // Shop button states
+    // shop buttons
     const [botBuyButtonText, setBotBuyButtonText] = useState("30W$ - wawabot3000 - buy nao!!!");
     const [botButtonColor, setBotButtonColor] = useState("bg-green-500 hover:bg-green-600");
     const [forumBuyButtonText, setForumBuyButtonText] = useState("150W$ - ask for wawas on forum - buy nao!!!");
     const [forumButtonColor, setForumButtonColor] = useState("bg-green-500 hover:bg-green-600");
 
-    // Wawa image state
+    // wawa 
     enum WawaState { Normal = 'normal', Wawa = 'wawa', Unwawa = 'unwawa', Recover = 'rewawa', Spent = 'money', Pet = 'yayay' }
     const [wawaState, setWawaState] = useState<WawaState>(WawaState.Normal);
 
-    // Menu states
+    // menus
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [changelogOpen, setChangelogOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-    // Item counts
+    // items
     const [botClicking, setBotClicking] = useState<number>(0);
     const [forumClicking, setForumClicking] = useState<number>(0);
+
+    // calc helper
     const [last5SecondsCounts, setLast5SecondsCounts] = useState<number[]>([]);
 
-    // Image positioning state
+    // image positioning state
     const [imagePositionClass, setImagePositionClass] = useState("absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500");
 
-    // This effect runs once on mount on the client side
+    // this effect runs once on mount on the client side
     useEffect(() => {
         setIsClient(true);
 
         const storedCount = getCookie('wawas');
         setCount(storedCount ? parseInt(storedCount as string, 10) : 0);
 
+        if (theme !== 'dark') {
         const storedTheme = getCookie('theme');
         if (storedTheme) {
             setTheme(storedTheme as string);
         } else {
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            setTheme(systemTheme);
-            setCookie('theme', systemTheme);
+                setTheme('light');
+            }
         }
 
         setTesting(window.location.hostname !== 'wawa-clicker.web.app');
@@ -76,7 +77,6 @@ export default function Home() {
         const storedForumCount = getCookie('wawaforums');
         setForumClicking(storedForumCount ? parseInt(storedForumCount as string, 10) : 0);
 
-        // Alert logic - needs to be careful with alertShown persistence
         const dataLoadedAlertShownKey = 'dataLoadedAlertShown';
         const alertShown = getCookie(dataLoadedAlertShownKey);
         const storedCountCookie = getCookie('wawas');
@@ -90,7 +90,7 @@ export default function Home() {
         }
     }, [setTheme]); // setTheme is stable, so this runs effectively once on client mount
 
-    // Document title effect
+    //  title
     useEffect(() => {
         if (isClient) {
             const interval = setInterval(() => {
@@ -100,14 +100,14 @@ export default function Home() {
         }
     }, [count, isClient]);
 
-    // Save count to cookie effect
+    // save counting
     useEffect(() => {
         if (isClient) {
             setCookie('wawas', count.toString());
         }
     }, [count, isClient]);
 
-    // WPS calculation effect
+    // wps calculations
     useEffect(() => {
         if (isClient) {
             const interval = setInterval(() => {
@@ -129,9 +129,9 @@ export default function Home() {
                 return currentWpsNum > prevWpsNum ? currentWpsString : prevWps;
             });
         }
-    }, [last5SecondsCounts, isClient]); // Removed wps from deps to avoid loop
+    }, [last5SecondsCounts, isClient]); 
 
-    // Bot clicking effect
+    // bot clicky
     useEffect(() => {
         let intervalTimer: NodeJS.Timeout | null = null;
         if (isClient && botClicking > 0) {
@@ -141,7 +141,7 @@ export default function Home() {
         return () => { if (intervalTimer) clearInterval(intervalTimer); };
     }, [botClicking, isClient]);
 
-    // Forum clicking effect
+    // forum clicky
     useEffect(() => {
         let intervalTimer: NodeJS.Timeout | null = null;
         if (isClient && forumClicking > 0) {
@@ -178,9 +178,6 @@ export default function Home() {
     const incrementCountByPet = () => {
         setCount((prevCount) => prevCount + 1);
         setWawaState(WawaState.Pet);
-        setTimeout(() => {
-            setWawaState(WawaState.Normal); // Revert after animation
-        }, 300);
     };
 
     const incrementCount = () => {
@@ -199,9 +196,6 @@ export default function Home() {
     const deincrementCount = () => {
         setWawaState(WawaState.Unwawa);
         setCount((prevCount) => prevCount - 1);
-        setTimeout(() => {
-            setWawaState(WawaState.Normal);
-        }, 150);
     };
 
     const ouchBuy = () => {
@@ -209,8 +203,7 @@ export default function Home() {
         setFlashRed(true);
         setTimeout(() => {
             setFlashRed(false);
-            setWawaState(WawaState.Normal);
-        }, 500);
+        }, 1000);
     };
     
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -310,15 +303,46 @@ export default function Home() {
 
             <div className={imagePositionClass} onClick={incrementCountByPet}>
                 {wawaState === WawaState.Wawa ? (
-                    <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png" alt=":D" width={500} height={500} className="animate-wiggle" priority unoptimized />
+ <Image
+ src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png"
+ alt=":D"
+ width={500}
+ height={500}
+ className={`animate-wiggle ${theme === "dark" ? "invert" : ""}`}
+ priority
+ unoptimized
+ />
                 ) : wawaState === WawaState.Unwawa ? (
-                    <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sad.png" alt=":(" width={500} height={500} className="animate-wiggle" unoptimized />
+ <Image
+ src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sad.png"
+ alt=":("
+ width={500}
+ height={500}
+ className={`animate-wiggle ${theme === "dark" ? "invert" : ""}`}
+ unoptimized
+ />
                 ) : wawaState === WawaState.Pet ? (
-                    <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/yay.png" alt="^w^" width={500} height={500} className="animate-bounce" priority unoptimized />
+ <Image
+ src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/yay.png"
+ alt="^w^"
+ width={500}
+ height={500}
+ className={`animate-bounce ${theme === "dark" ? "invert" : ""}`}
+ priority
+ unoptimized
+ />
                 ) : wawaState === WawaState.Spent ? (
-                    <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/spent.png" alt=":3 $" width={500} height={500} className="animate-wiggle" priority unoptimized />
+ <Image
+ src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/spent.png"
+ alt=":3 $"
+ width={500}
+ height={500}
+ className={`animate-wiggle ${theme === "dark" ? "invert" : ""}`}
+ priority
+ unoptimized
+ />
                 ) : (
-                    <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/aw.png" alt=":3" width={500} height={500} unoptimized />
+ <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/aw.png" alt=":3" width={500} height={500} className={theme === "dark" ? "invert" : ""} unoptimized />
                 )}
             </div>
 
@@ -358,7 +382,7 @@ export default function Home() {
             
             <Sheet open={isSettingsOpen} onOpenChange={toggleSettings}>
                 <SheetTrigger asChild>
-                    <div className="absolute right-20 top-4 z-50 cursor-pointer"> {/* Adjusted for new icon */}
+                    <div className="absolute right-20 top-4 z-50 cursor-pointer">
                         <FaCog size={30} color={theme === "dark" ? "white" : "black"} />
                     </div>
                 </SheetTrigger>
@@ -367,7 +391,11 @@ export default function Home() {
                         <h4 className="font-bold text-xl text-white p-2">Settoing</h4>
                     </div>
                     <Divider />
-                    <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>Dark/Light Mode - Currently {theme}</Button>
+                    <Button onClick={() => { 
+                    setTheme(theme === "dark" ? "light" : "dark"); 
+                    setCookie('theme', theme === "dark" ? "light" : "dark");
+                    }}>Dark/Light Mode - Currently {theme}</Button>
+
                 </SheetContent>
             </Sheet>
 
