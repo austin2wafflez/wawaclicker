@@ -1,4 +1,5 @@
 
+
 "use client";
 
 //importing
@@ -49,7 +50,6 @@ export default function Home() {
           window.alert("data loaded :3");
         }
         alertShown = true
-
       }
     }
   }, []);
@@ -80,15 +80,33 @@ export default function Home() {
     "bg-green-500 hover:bg-green-600"
   );
 
-  //wawa stuff
+//theming
 
-  const { theme, setTheme } = useTheme(); //this is kinda redundant but whatever
+  const { theme, setTheme } = useTheme(); // made it not redundant
+
+  useEffect(() => {
+    const storedTheme = getCookie('theme');
+    if (storedTheme) {
+      setTheme(storedTheme as string);
+    } else {
+      let systemTheme = 'light'; // set light mode as default
+      if (typeof window !== 'undefined' && window.matchMedia) {
+        systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      setTheme(systemTheme);
+      setCookie('theme', systemTheme);
+    }
+  }, [setTheme]);
+
+  //wawa stuff
 
   enum WawaState {
     Normal = 'normal',
     Wawa = 'wawa',
     Unwawa = 'unwawa',
-    Recover = 'rewawa'
+    Recover = 'rewawa',
+    Spent = 'money'
   }
   const [wawaState, setWawaState] = useState<WawaState>(WawaState.Normal)
 
@@ -155,7 +173,7 @@ export default function Home() {
   };
 
   const ouchBuy = () => {
-    setWawaState(WawaState.Wawa)
+    setWawaState(WawaState.Spent)
     setFlashRed(true);
     setTimeout(() => setFlashRed(false), 500);
   };
@@ -236,7 +254,7 @@ export default function Home() {
     setWps((prevWps) => {
       const prevWpsNum = parseFloat(prevWps);
       const currentWpsNum = parseFloat(currentWps);
-      // keep the highest value on display
+      // keep the highest value on display instead of constantly updating
       return currentWpsNum > prevWpsNum ? currentWps : prevWps;
     });
 
@@ -350,7 +368,7 @@ export default function Home() {
 
       <div className={
         isMobile || count < 0 || (typeof window !== 'undefined' && window.innerWidth < 906)
-          ? "absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500" 
+          ? "absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500"
           : "absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500"
       }>
         {wawaState === WawaState.Wawa ? (
@@ -370,6 +388,15 @@ export default function Home() {
             height={500}
             className="animate-wiggle"
           />
+        ) : wawaState === WawaState.Spent ? (
+          <Image
+            src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/spent.png"
+            alt=":3 $"
+            width={500}
+            height={500}
+            className="animate-wiggle"
+            priority
+          /> 
         ) : (
           <Image
             src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/aw.png"
@@ -438,7 +465,7 @@ export default function Home() {
           </DropdownMenuContent>
         </DropdownMenu>
       </Sheet>
-      
+
       <Sheet open={isSettingsOpen} onOpenChange={toggleSettings}>
         <SheetTrigger asChild>
           <div className="absolute right-22 top-4 z-50 cursor-pointer">
@@ -453,8 +480,10 @@ export default function Home() {
             <h4 className="font-bold text-xl text-white p-2">Settoing</h4>
           </div>
 
+                  <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>Dark/Light Mode - Currently {theme}</Button>
+
         </SheetContent>
-        </Sheet>
+      </Sheet>
 
     </main>
   );
