@@ -403,7 +403,7 @@ export default function Home() {
                         alt="^w^"
                         width={500}
                         height={500}
-                        className="animate-squish"
+                        className="animate-bounce"
                         priority
                     />
                 ) : wawaState === WawaState.Spent ? (
