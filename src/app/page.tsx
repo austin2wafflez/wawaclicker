@@ -371,7 +371,7 @@ export default function Home() {
                 isMobile || count < 0 || (typeof window !== 'undefined' && window.innerWidth < 906)
                     ? "absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500"
                     : "absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500"
-            } onClick={() => setWawaState(WawaState.Pet)}>
+            } onClick={() => setWawaState(WawaState.Pet), incrementCount() }>
                 {wawaState === WawaState.Wawa ? (
                     <Image
                         src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png"
@@ -395,7 +395,7 @@ export default function Home() {
                         alt="^w^"
                         width={500}
                         height={500}
-                        className="animate-wiggle"
+                        className="animate-squish"
                         priority
                     />
                 ) : wawaState === WawaState.Spent ? (
