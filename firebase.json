@@ -1,13 +1,13 @@
 {
   "hosting": {
-    "source": ".",
+    "source": ".", // Tells Firebase to look for a frameworks-aware project
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
     "frameworksBackend": {
-      "region": "us-west1"
+      "region": "us-central1" // You can change this to your preferred region
     }
   }
 }

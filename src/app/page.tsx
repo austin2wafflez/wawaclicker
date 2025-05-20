@@ -1,283 +1,228 @@
 
-
 "use client";
 
 //importing
 import { toast } from "sonner";
-import { Button, ButtonProps } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { getCookie, setCookie } from "cookies-next";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { FaShoppingCart } from "react-icons/fa";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { isMobile } from "react-device-detect";
-import Head from "next/head";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"; // DropdownMenuItem not used directly
+import { isMobile as isMobileDevice } from "react-device-detect"; // Renamed to avoid conflict
+// Head component is not used in App Router pages like this, metadata is preferred.
 import { motion } from "framer-motion";
 import { FiFileText } from "react-icons/fi";
 import { FaCog } from "react-icons/fa";
-
-<Head>
-    <title>clickclick - loading wawas...</title>
-</Head>
 
 const Divider: React.FC = () => {
     return <div style={{ height: '13px', visibility: 'hidden' }} />;
 };
 
-//counting stuff
-
 export default function Home() {
-    const [count, setCount] = useState<number>(() => {
-        const storedCount = getCookie('wawas');
-        return storedCount ? parseInt(storedCount as string, 10) : 0;
-    });
-
+    const [isClient, setIsClient] = useState(false);
+    const [count, setCount] = useState<number>(0); // Initialized to 0, will be updated from cookie on client
     const [wps, setWps] = useState<string>("0");
     const [flashRed, setFlashRed] = useState(false);
+    const [testing, setTesting] = useState(false); // Default to false, updated on client
 
+    const { theme, setTheme } = useTheme();
+
+    // Shop button states
+    const [botBuyButtonText, setBotBuyButtonText] = useState("30W$ - wawabot3000 - buy nao!!!");
+    const [botButtonColor, setBotButtonColor] = useState("bg-green-500 hover:bg-green-600");
+    const [forumBuyButtonText, setForumBuyButtonText] = useState("150W$ - ask for wawas on forum - buy nao!!!");
+    const [forumButtonColor, setForumButtonColor] = useState("bg-green-500 hover:bg-green-600");
+
+    // Wawa image state
+    enum WawaState { Normal = 'normal', Wawa = 'wawa', Unwawa = 'unwawa', Recover = 'rewawa', Spent = 'money', Pet = 'yayay' }
+    const [wawaState, setWawaState] = useState<WawaState>(WawaState.Normal);
+
+    // Menu states
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [changelogOpen, setChangelogOpen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+    // Item counts
+    const [botClicking, setBotClicking] = useState<number>(0);
+    const [forumClicking, setForumClicking] = useState<number>(0);
+    const [last5SecondsCounts, setLast5SecondsCounts] = useState<number[]>([]);
+
+    // Image positioning state
+    const [imagePositionClass, setImagePositionClass] = useState("absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500");
+
+    // This effect runs once on mount on the client side
     useEffect(() => {
-        let alertShown = false;
+        setIsClient(true);
+
         const storedCount = getCookie('wawas');
-        if (storedCount) {
-            if (!alertShown) {
-                if (isMobile) {
-                    toast.success("data loaded :3");
-                } else {
-                    window.alert("data loaded :3");
-                }
-                alertShown = true
-            }
-        }
-    }, []);
+        setCount(storedCount ? parseInt(storedCount as string, 10) : 0);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            document.title = `clickclick - ${count} wawas`;
-        }, 10); // Update title every hundredth a second
-
-        // cleanup the interval on unmount
-        return () => clearInterval(interval);
-    }, [count]);
-
-
-    //shop stuff
-
-
-    const [botBuyButtonText, setBotBuyButtonText] = useState(
-        "30W$ - wawabot3000 - buy nao!!!"
-    );
-    const [botButtonColor, setBotButtonColor] = useState(
-        "bg-green-500 hover:bg-green-600"
-    );
-    const [forumBuyButtonText, setForumBuyButtonText] = useState(
-        "150W$ - ask for wawas on forum - buy nao!!!"
-    );
-    const [forumButtonColor, setForumButtonColor] = useState(
-        "bg-green-500 hover:bg-green-600"
-    );
-
-    //theming
-
-    const { theme, setTheme } = useTheme(); // made it not redundant
-
-    useEffect(() => {
         const storedTheme = getCookie('theme');
         if (storedTheme) {
             setTheme(storedTheme as string);
         } else {
-            let systemTheme = 'light'; // set light mode as default
-            if (typeof window !== 'undefined' && window.matchMedia) {
-                systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-
+            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             setTheme(systemTheme);
             setCookie('theme', systemTheme);
         }
-    }, [setTheme]);
 
-    //wawa stuff
+        setTesting(window.location.hostname !== 'wawa-clicker.web.app');
+        
+        const storedBotCount = getCookie('wawabots');
+        setBotClicking(storedBotCount ? parseInt(storedBotCount as string, 10) : 0);
+        const storedForumCount = getCookie('wawaforums');
+        setForumClicking(storedForumCount ? parseInt(storedForumCount as string, 10) : 0);
 
-    enum WawaState {
-        Normal = 'normal',
-        Wawa = 'wawa',
-        Unwawa = 'unwawa',
-        Recover = 'rewawa',
-        Spent = 'money',
-        Pet = 'yayay'
-    }
-    const [wawaState, setWawaState] = useState<WawaState>(WawaState.Normal)
+        // Alert logic - needs to be careful with alertShown persistence
+        const dataLoadedAlertShownKey = 'dataLoadedAlertShown';
+        const alertShown = getCookie(dataLoadedAlertShownKey);
+        const storedCountCookie = getCookie('wawas');
+        if (storedCountCookie && !alertShown) {
+            if (isMobileDevice) {
+                toast.success("data loaded :3");
+            } else {
+                window.alert("data loaded :3");
+            }
+            setCookie(dataLoadedAlertShownKey, 'true', { maxAge: 60 * 60 * 24 }); // Show once per day
+        }
+    }, [setTheme]); // setTheme is stable, so this runs effectively once on client mount
 
-    //save data
+    // Document title effect
+    useEffect(() => {
+        if (isClient) {
+            const interval = setInterval(() => {
+                document.title = `clickclick - ${count} wawas`;
+            }, 10);
+            return () => clearInterval(interval);
+        }
+    }, [count, isClient]);
+
+    // Save count to cookie effect
+    useEffect(() => {
+        if (isClient) {
+            setCookie('wawas', count.toString());
+        }
+    }, [count, isClient]);
+
+    // WPS calculation effect
+    useEffect(() => {
+        if (isClient) {
+            const interval = setInterval(() => {
+                const now = Date.now();
+                setLast5SecondsCounts(prevCounts => prevCounts.filter(time => now - time <= 10000));
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [isClient]);
 
     useEffect(() => {
-        setCookie('wawas', count.toString());
-    }, [count]);
+        if (isClient) {
+            const countInLast5Seconds = last5SecondsCounts.length;
+            const wpsValue = countInLast5Seconds / 10; // Calculate per second over 10s window
+            const currentWpsString = wpsValue.toFixed(2);
+            setWps(prevWps => {
+                const prevWpsNum = parseFloat(prevWps);
+                const currentWpsNum = parseFloat(currentWpsString);
+                return currentWpsNum > prevWpsNum ? currentWpsString : prevWps;
+            });
+        }
+    }, [last5SecondsCounts, isClient]); // Removed wps from deps to avoid loop
 
-    //counting input
+    // Bot clicking effect
+    useEffect(() => {
+        let intervalTimer: NodeJS.Timeout | null = null;
+        if (isClient && botClicking > 0) {
+            const botInterval = Math.max(2500 - (botClicking * 100), 500);
+            intervalTimer = setInterval(artiCount, botInterval);
+        }
+        return () => { if (intervalTimer) clearInterval(intervalTimer); };
+    }, [botClicking, isClient]);
+
+    // Forum clicking effect
+    useEffect(() => {
+        let intervalTimer: NodeJS.Timeout | null = null;
+        if (isClient && forumClicking > 0) {
+            const forumInterval = Math.max(500 - (forumClicking * 45), 50);
+            intervalTimer = setInterval(() => {
+                artiCount();
+                setTimeout(artiCount, forumInterval);
+            }, forumInterval * 2);
+        }
+        return () => { if (intervalTimer) clearInterval(intervalTimer); };
+    }, [forumClicking, isClient]);
+
+    // Shop item save effects
+    useEffect(() => { if (isClient) setCookie('wawaforums', forumClicking.toString()); }, [forumClicking, isClient]);
+    useEffect(() => { if (isClient) setCookie('wawabots', botClicking.toString()); }, [botClicking, isClient]);
+
+    // Image positioning effect
+     useEffect(() => {
+        if (isClient) {
+            const updateImagePosition = () => {
+                if (isMobileDevice || count < 0 || window.innerWidth < 906) {
+                    setImagePositionClass("absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500");
+                } else {
+                    setImagePositionClass("absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500");
+                }
+            };
+            updateImagePosition();
+            window.addEventListener('resize', updateImagePosition);
+            return () => window.removeEventListener('resize', updateImagePosition);
+        }
+    }, [isClient, isMobileDevice, count]);
+
 
     const incrementCountByPet = () => {
         setCount((prevCount) => prevCount + 1);
-    }
+        setWawaState(WawaState.Pet);
+        setTimeout(() => {
+            setWawaState(WawaState.Normal); // Revert after animation
+        }, 300);
+    };
 
     const incrementCount = () => {
         setCount((prevCount) => prevCount + 1);
-
-        if (wawaState === WawaState.Unwawa) {
-            setWawaState(WawaState.Recover)
-        }
-
-        setWawaState(WawaState.Wawa)
+        setWawaState(WawaState.Wawa);
         setTimeout(() => {
-            setWawaState(WawaState.Normal)
-        }, 150)
-
-        if (wawaState === WawaState.Unwawa) {
-            setWawaState(WawaState.Recover)
-        }
-    }
-
-    const [last5SecondsCounts, setLast5SecondsCounts] = useState<number[]>([])
+            setWawaState(WawaState.Normal);
+        }, 150);
+    };
 
     const artiCount = () => {
         setCount((prevCount) => prevCount + 1);
         setLast5SecondsCounts((prevCounts) => [...prevCounts, Date.now()]);
-    }
-
-    useEffect(() => {
-        let interval: NodeJS.Timeout | null = null;
-
-        const updateCounts = () => {
-            const now = Date.now();
-            setLast5SecondsCounts(prevCounts => prevCounts.filter(time => now - time <= 10000));
-        };
-
-        updateCounts(); // Initial cleanup
-        interval = setInterval(updateCounts, 1000);
-
-        return () => interval && clearInterval(interval)
-    }, [])
-
-    const deincrementCount = () => {
-        setWawaState(WawaState.Unwawa)
-        setCount((prevCount) => {
-            const newCount = prevCount - 1;
-            if (newCount < prevCount) { // Check if count actually decreased
-            }
-            return newCount;
-        })
-
-        if (wawaState === WawaState.Recover) {
-            setWawaState(WawaState.Normal)
-        }
     };
 
-    const ouch = () => {
-        setWawaState(WawaState.Unwawa)
-        setFlashRed(true);
-        setTimeout(() => setFlashRed(false), 500);
+    const deincrementCount = () => {
+        setWawaState(WawaState.Unwawa);
+        setCount((prevCount) => prevCount - 1);
+        setTimeout(() => {
+            setWawaState(WawaState.Normal);
+        }, 150);
     };
 
     const ouchBuy = () => {
-        setWawaState(WawaState.Spent)
+        setWawaState(WawaState.Spent);
         setFlashRed(true);
-        setTimeout(() => setFlashRed(false), 500);
+        setTimeout(() => {
+            setFlashRed(false);
+            setWawaState(WawaState.Normal);
+        }, 500);
     };
-
-    // menu stuff
-
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    const [changelogOpen, setChangelogOpen] = useState(false);
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-    const toggleSettings = () => {
-        setIsSettingsOpen(!isSettingsOpen)
-    };
-
-
-
-    const [botClicking, setBotClicking] = useState<number>(() => {
-        const storedBotCount = getCookie('wawabots');
-        return storedBotCount ? parseInt(storedBotCount as string, 10) : 0;
-    });
-    const [forumClicking, setForumClicking] = useState<number>(() => {
-        const storedForumCount = getCookie('wawaforums');
-        return storedForumCount ? parseInt(storedForumCount as string, 10) : 0;
-    });
-
-
-    useEffect(() => {
-        let intervalTimer: NodeJS.Timeout | null = null;
-
-        const botInterval = Math.max(2500 - (botClicking * 100), 500);
-        //makes sure the minimum interval is .5 seconds so we dont get lightspeed wawa
-
-        if (botClicking > 0) {
-            intervalTimer = setInterval(() => artiCount(), botInterval)
-        }
-
-        return () => {
-            if (intervalTimer) clearInterval(intervalTimer);
-        }
-
-        // reset
-
-    }, [botClicking]);
-
-    useEffect(() => {
-        let intervalTimer: NodeJS.Timeout | null = null;
-
-        // don't click twice at the same time, spread clicking over alotted time in ms
-        const forumInterval = Math.max(500 - (forumClicking * 45), 50);
-
-        if (forumClicking > 0) {
-            intervalTimer = setInterval(() => {
-                artiCount();
-                setTimeout(() => artiCount(), forumInterval);
-            }, forumInterval * 2);
-        }
-    }, [forumClicking]);
-
-    // shopsave
-
-    useEffect(() => {
-        setCookie('wawaforums', forumClicking.toString());
-    }, [forumClicking]);
-
-    useEffect(() => {
-        setCookie('wawabots', botClicking.toString());
-    }, [botClicking]);
-
-    //calc wawas
-
-    useEffect(() => {
-        const countInLast5Seconds = last5SecondsCounts.length;
-        const wpsValue = countInLast5Seconds / 10;
-        const currentWps = wpsValue.toFixed(2);
-        setWps((prevWps) => {
-            const prevWpsNum = parseFloat(prevWps);
-            const currentWpsNum = parseFloat(currentWps);
-            // keep the highest value on display instead of constantly updating
-            return currentWpsNum > prevWpsNum ? currentWps : prevWps;
-        });
-
-    }, [last5SecondsCounts, wps]);
-
-    //Buttons
+    
+    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    const toggleSettings = () => setIsSettingsOpen(!isSettingsOpen);
 
     const handleBotBuyButtonClick = () => {
         if (count >= 30) {
             setCount((prevCount) => prevCount - 30);
-            setBotClicking((prevClicking) => prevClicking + 1)
+            setBotClicking((prevClicking) => prevClicking + 1);
             setBotBuyButtonText("Bought!");
             ouchBuy();
-            setTimeout(() => {
-                setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
-            }, 1000)
+            setTimeout(() => setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!"), 1000);
             setBotButtonColor("bg-green-500 hover:bg-green-600");
         } else {
             setBotBuyButtonText("Too Expensive 3:");
@@ -285,19 +230,17 @@ export default function Home() {
             setTimeout(() => {
                 setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
                 setBotButtonColor("bg-green-500 hover:bg-green-600");
-            }, 1000)
+            }, 1000);
         }
-    }
+    };
 
     const handleForumBuyButtonClick = () => {
         if (count >= 150) {
             setCount((prevCount) => prevCount - 150);
-            setForumClicking((prevClicking) => prevClicking + 1)
+            setForumClicking((prevClicking) => prevClicking + 1);
             setForumBuyButtonText("Bought!");
             ouchBuy();
-            setTimeout(() => {
-                setForumBuyButtonText("150W$ - ask for wawas on forum - buy nao!!!");
-            }, 1000);
+            setTimeout(() => setForumBuyButtonText("150W$ - ask for wawas on forum - buy nao!!!"), 1000);
             setForumButtonColor("bg-green-500 hover:bg-green-600");
         } else {
             setForumBuyButtonText("Too Expensive 3:");
@@ -305,12 +248,13 @@ export default function Home() {
             setTimeout(() => {
                 setForumBuyButtonText("150W$ - ask for wawas on forum - buy nao!!!");
                 setForumButtonColor("bg-green-500 hover:bg-green-600");
-            }, 1000)
+            }, 1000);
         }
-    }
+    };
 
-    //determine where you're loading from, wawa count, wawacat, wawashop
-    const testing = window.location.hostname !== 'wawa-clicker.web.app';
+    if (!isClient) {
+        return null; // Or a loading spinner
+    }
 
     return (
         <main
@@ -339,15 +283,11 @@ export default function Home() {
                             {count}
                         </span> times!
                     </>
-
-
                 )}
             </motion.div>
             <div className="w-full flex justify-left">
                 <div className="text-xs text-gray-500">{wps} wawas per second</div>
             </div>
-
-
 
             <div className="flex space-x-4 relative">
                 <Button
@@ -368,152 +308,76 @@ export default function Home() {
                 </Button>
             </div>
 
-
-
-            <div className={
-                isMobile || count < 0 || (typeof window !== 'undefined' && window.innerWidth < 906)
-                    ? "absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500"
-                    : "absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500"
-            } onClick={() => { setWawaState(WawaState.Pet); incrementCountByPet(); }}>
+            <div className={imagePositionClass} onClick={incrementCountByPet}>
                 {wawaState === WawaState.Wawa ? (
-                    <Image
-                        src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png"
-                        alt=":D"
-                        width={500}
-                        height={500}
-                        className="animate-wiggle"
-                        priority
-                    />
+                    <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png" alt=":D" width={500} height={500} className="animate-wiggle" priority unoptimized />
                 ) : wawaState === WawaState.Unwawa ? (
-                    <Image
-                        src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sad.png"
-                        alt=":("
-                        width={500}
-                        height={500}
-                        className="animate-wiggle"
-                    />
+                    <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sad.png" alt=":(" width={500} height={500} className="animate-wiggle" unoptimized />
                 ) : wawaState === WawaState.Pet ? (
-                    <Image
-                        src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/yay.png"
-                        alt="^w^"
-                        width={500}
-                        height={500}
-                        className="animate-bounce"
-                        priority
-                    />
+                    <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/yay.png" alt="^w^" width={500} height={500} className="animate-bounce" priority unoptimized />
                 ) : wawaState === WawaState.Spent ? (
-                    <Image
-                        src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/spent.png"
-                        alt=":3 $"
-                        width={500}
-                        height={500}
-                        className="animate-wiggle"
-                        priority
-                    />
+                    <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/spent.png" alt=":3 $" width={500} height={500} className="animate-wiggle" priority unoptimized />
                 ) : (
-                    <Image
-                        src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/aw.png"
-                        alt=":3"
-                        width={500}
-                        height={500}
-                    />
+                    <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/aw.png" alt=":3" width={500} height={500} unoptimized />
                 )}
             </div>
 
             <Sheet open={isMenuOpen} onOpenChange={toggleMenu}>
                 <SheetTrigger asChild>
                     <div className="absolute right-4 top-4 z-50 cursor-pointer">
-                        <FaShoppingCart
-                            size={30}
-                            color={theme === "light" ? "white" : "black"}
-                        />
+                        <FaShoppingCart size={30} color={theme === "dark" ? "white" : "black"} />
                     </div>
                 </SheetTrigger>
                 <SheetContent side="right" className="bg-opacity-95 backdrop-blur-md">
                     <div className="w-full flex justify-center items-center">
                         <h4 className="font-bold text-xl text-white p-2">The Shoppe~</h4>
                     </div>
-
-                    <div>
-                        /br
-                        /br
-                    </div>
-
-                    <div
-                        className="flex flex-col gap-4 w-full h-70% justify-start items-right"
-                    >
-                        <Button
-                            className={`font-bold ${botButtonColor} text-white mr-4`}
-                            onClick={handleBotBuyButtonClick}
-                        >
+                    <Divider /> 
+                    <div className="flex flex-col gap-4 w-full justify-start items-stretch">
+                        <Button className={`font-bold ${botButtonColor} text-white`} onClick={handleBotBuyButtonClick}>
                             {botBuyButtonText}
                         </Button>
-                    </div>
-                    <Divider />
-                    <div
-                        className="flex flex-col gap-4 w-full h-70% justify-start items-right"
-                    >
-                        <Button
-                            className={`font-bold ${forumButtonColor} text-white mr-4`}
-                            onClick={handleForumBuyButtonClick}
-                        >
+                         <Divider />
+                        <Button className={`font-bold ${forumButtonColor} text-white`} onClick={handleForumBuyButtonClick}>
                             {forumBuyButtonText}
                         </Button>
                     </div>
                 </SheetContent>
-
-                <DropdownMenu open={changelogOpen} onOpenChange={setChangelogOpen}>
-                    <DropdownMenuTrigger asChild>
-                        <SheetTrigger asChild>
-                            <div className="absolute right-12 top-4 z-50 cursor-pointer flex items-center space-x-2">
-                                <FiFileText
-                                    size={30}
-                                    color={theme === "light" ? "white" : "black"}
-                                />
-                            </div>
-                        </SheetTrigger>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="p-0 w-400 h-400">
-                        <iframe src="https://austin2wafflez.github.io/wawaclicker/changelog.html" className="w-500 h-150 border-0"></iframe>
-                    </DropdownMenuContent>
-                </DropdownMenu>
             </Sheet>
 
+            <DropdownMenu open={changelogOpen} onOpenChange={setChangelogOpen}>
+                <DropdownMenuTrigger asChild>
+                    <div className="absolute right-12 top-4 z-50 cursor-pointer flex items-center space-x-2">
+                        <FiFileText size={30} color={theme === "dark" ? "white" : "black"} />
+                    </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="p-0 w-[400px] h-[400px]">
+                    <iframe src="https://austin2wafflez.github.io/wawaclicker/changelog.html" className="w-full h-full border-0"></iframe>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            
             <Sheet open={isSettingsOpen} onOpenChange={toggleSettings}>
                 <SheetTrigger asChild>
-                    <div className="absolute right-22 top-4 z-50 cursor-pointer">
-                        <FaCog
-                            size={30}
-                            color={theme === "light" ? "white" : "black"}
-                        />
+                    <div className="absolute right-20 top-4 z-50 cursor-pointer"> {/* Adjusted for new icon */}
+                        <FaCog size={30} color={theme === "dark" ? "white" : "black"} />
                     </div>
                 </SheetTrigger>
                 <SheetContent side="left" className="bg-opacity-95 backdrop-blur-md">
                     <div className="w-full flex justify-center items-center">
                         <h4 className="font-bold text-xl text-white p-2">Settoing</h4>
                     </div>
-
+                    <Divider />
                     <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>Dark/Light Mode - Currently {theme}</Button>
-
                 </SheetContent>
             </Sheet>
+
             <div className="absolute bottom-4 w-full text-center text-gray-500 text-sm">
                 {testing ? (
-                    <a
-                    href="https://wawa-clicker.web.app"
-                    className="underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    click here to go back to the stable build!
-                </a>
+                    <a href="https://wawa-clicker.web.app" className="underline" target="_blank" rel="noopener noreferrer">
+                        click here to go back to the stable build!
+                    </a>
                 ) : (
-                    <a
-                        href="https://9000-idx-studio-1745504646182.cluster-rhptpnrfenhe4qarq36djxjqmg.cloudworkstations.dev/?monospaceUid=572770"
-                        className="underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
+                    <a href="https://9000-idx-studio-1745504646182.cluster-rhptpnrfenhe4qarq36djxjqmg.cloudworkstations.dev/?monospaceUid=572770" className="underline" target="_blank" rel="noopener noreferrer">
                         wanna try stuff AS I ADD IT? click here!! (warning - breaks often)
                     </a>
                 )}

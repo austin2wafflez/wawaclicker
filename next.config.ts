@@ -2,7 +2,7 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
-  output: 'export',
+  // output: 'export', // Removed to enable server mode
   typescript: {
     ignoreBuildErrors: true,
   },
