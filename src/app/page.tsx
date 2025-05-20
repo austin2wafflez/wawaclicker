@@ -173,7 +173,7 @@ export default function Home() {
   };
 
   const ouchBuy = () => {
-    setWawaState(WawaState.Wawa)
+    setWawaState(WawaState.Spent)
     setFlashRed(true);
     setTimeout(() => setFlashRed(false), 500);
   };
