@@ -119,6 +119,10 @@ export default function Home() {
 
     //counting input
 
+    const incrementCountByPet = () => {
+        setCount((prevCount) => prevCount + 1);
+    }
+
     const incrementCount = () => {
         setCount((prevCount) => prevCount + 1);
 
@@ -130,6 +134,10 @@ export default function Home() {
         setTimeout(() => {
             setWawaState(WawaState.Normal)
         }, 150)
+
+        if (wawaState === WawaState.Unwawa) {
+            setWawaState(WawaState.Recover)
+        }
     }
 
     const [last5SecondsCounts, setLast5SecondsCounts] = useState<number[]>([])
@@ -371,7 +379,7 @@ export default function Home() {
                 isMobile || count < 0 || (typeof window !== 'undefined' && window.innerWidth < 906)
                     ? "absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500"
                     : "absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500"
-            } onClick={() => { setWawaState(WawaState.Pet); incrementCount(); }}>
+            } onClick={() => { setWawaState(WawaState.Pet); incrementCountByPet(); }}>
                 {wawaState === WawaState.Wawa ? (
                     <Image
                         src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png"
@@ -470,7 +478,7 @@ export default function Home() {
                             </div>
                         </SheetTrigger>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="p-0 w-250 h-400">
+                    <DropdownMenuContent className="p-0 w-400 h-400">
                         <iframe src="https://austin2wafflez.github.io/wawaclicker/changelog.html" className="w-500 h-150 border-0"></iframe>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -494,8 +502,11 @@ export default function Home() {
 
                 </SheetContent>
             </Sheet>
-
+            <div className="absolute bottom-4 w-full text-center text-gray-500 text-sm">
+                <a href="https://9000-idx-studio-1745504646182.cluster-rhptpnrfenhe4qarq36djxjqmg.cloudworkstations.dev/?monospaceUid=572770" className="underline" target="_blank" rel="noopener noreferrer">
+                    wanna try stuff AS I ADD IT? click here!! (warning - breaks often)
+                </a>
+            </div>
         </main>
     );
 }
-
