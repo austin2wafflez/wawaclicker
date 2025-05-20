@@ -260,7 +260,7 @@ export default function Home() {
                 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-8 ${theme === "dark" ? "text-white" : ""
                     }`}
             >
-                You have wawa'd
+                Hi testers! You have wawa'd
             </h1>
             <motion.div
                 className={`text-6xl md:text-7xl lg:text-8xl font-semibold mb-12 transition-all duration-500 ${flashRed ? 'text-red-500 animate-bounce' : ''
@@ -394,7 +394,69 @@ export default function Home() {
                     <Button onClick={() => { 
                     setTheme(theme === "dark" ? "light" : "dark"); 
                     setCookie('theme', theme === "dark" ? "light" : "dark");
-                    }}>Dark/Light Mode - Currently {theme}</Button>
+                    }}>Dark/Light Mode - Currently {theme}
+                    <Divider />
+                    </Button>
+                    <Divider/>
+
+                                       <Button onClick={() => {
+                        const wawasValue = getCookie('wawas');
+                        const wawabotsValue = getCookie('wawabots');
+                        const wawaforumsValue = getCookie('wawaforums');
+
+                        const saveContent = `wawa-${wawasValue || '0'}\nbots-${wawabotsValue || '0'}\nforums-${wawaforumsValue || '0'}`;
+                        const blob = new Blob([saveContent], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'yoursave.wawa';
+                        link.click();
+                        URL.revokeObjectURL(url); // Clean up the object URL
+                    }}>save stuff to file</Button>
+                    <Divider/>
+                   <input
+                        type="file"
+                        accept=".wawa"
+                        onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    const content = e.target?.result as string;
+                                    const lines = content.split('\n');
+                                    let newWawas = count;
+                                    let newBots = botClicking;
+                                    let newForums = forumClicking;
+
+                                    lines.forEach(line => {
+                                        if (line.startsWith('wawa-')) {
+                                            newWawas = parseInt(line.substring('wawa-'.length));
+                                        } else if (line.startsWith('bots-')) {
+                                            newBots = parseInt(line.substring('bots-'.length));
+                                        } else if (line.startsWith('forums-')) {
+                                            newForums = parseInt(line.substring('forums-'.length));
+                                        }
+                                    });
+
+                                    setCount(newWawas);
+                                    setBotClicking(newBots);
+                                    setForumClicking(newForums);
+
+                                    setCookie('wawas', newWawas.toString());
+                                    setCookie('wawabots', newBots.toString());
+                                    setCookie('wawaforums', newForums.toString());
+                                    window.location.reload();
+                                };
+                                reader.readAsText(file);
+                            }
+                        }}
+                        className="hidden"
+                        id="load-wawa-file"
+                    />
+                    <label htmlFor="load-wawa-file" className="cursor-pointer bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded">
+                        load stuff from file (.wawa)
+                    </label>
+<Divider/>
 
                 </SheetContent>
             </Sheet>
