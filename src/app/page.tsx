@@ -260,7 +260,7 @@ export default function Home() {
                 className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-8 ${theme === "dark" ? "text-white" : ""
                     }`}
             >
-                Hi testers! You have wawa'd
+                You have wawa'd
             </h1>
             <motion.div
                 className={`text-6xl md:text-7xl lg:text-8xl font-semibold mb-12 transition-all duration-500 ${flashRed ? 'text-red-500 animate-bounce' : ''
