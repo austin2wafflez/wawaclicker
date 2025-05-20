@@ -22,8 +22,6 @@ import { FaCog } from "react-icons/fa";
     <title>clickclick - loading wawas...</title>
 </Head>
 
-
-
 const Divider: React.FC = () => {
     return <div style={{ height: '13px', visibility: 'hidden' }} />;
 };
@@ -311,11 +309,8 @@ export default function Home() {
         }
     }
 
-
-
-
-    //wawa count, wawacat, wawashop
-
+    //determine where you're loading from, wawa count, wawacat, wawashop
+    const testing = window.location.hostname !== 'wawa-clicker.web.app';
 
     return (
         <main
@@ -503,9 +498,25 @@ export default function Home() {
                 </SheetContent>
             </Sheet>
             <div className="absolute bottom-4 w-full text-center text-gray-500 text-sm">
-                <a href="https://9000-idx-studio-1745504646182.cluster-rhptpnrfenhe4qarq36djxjqmg.cloudworkstations.dev/?monospaceUid=572770" className="underline" target="_blank" rel="noopener noreferrer">
-                    wanna try stuff AS I ADD IT? click here!! (warning - breaks often)
+                {testing ? (
+                    <a
+                    href="https://wawa-clicker.web.app"
+                    className="underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    click here to go back to the stable build!
                 </a>
+                ) : (
+                    <a
+                        href="https://9000-idx-studio-1745504646182.cluster-rhptpnrfenhe4qarq36djxjqmg.cloudworkstations.dev/?monospaceUid=572770"
+                        className="underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        wanna try stuff AS I ADD IT? click here!! (warning - breaks often)
+                    </a>
+                )}
             </div>
         </main>
     );
