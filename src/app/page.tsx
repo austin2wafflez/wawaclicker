@@ -254,7 +254,7 @@ export default function Home() {
     setWps((prevWps) => {
       const prevWpsNum = parseFloat(prevWps);
       const currentWpsNum = parseFloat(currentWps);
-      // keep the highest value on display
+      // keep the highest value on display instead of constantly updating
       return currentWpsNum > prevWpsNum ? currentWps : prevWps;
     });
 
