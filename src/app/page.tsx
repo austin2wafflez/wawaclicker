@@ -106,7 +106,8 @@ export default function Home() {
         Wawa = 'wawa',
         Unwawa = 'unwawa',
         Recover = 'rewawa',
-        Spent = 'money'
+        Spent = 'money',
+        Pet = 'yayay'
     }
     const [wawaState, setWawaState] = useState<WawaState>(WawaState.Normal)
 
@@ -370,7 +371,7 @@ export default function Home() {
                 isMobile || count < 0 || (typeof window !== 'undefined' && window.innerWidth < 906)
                     ? "absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500"
                     : "absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500"
-            }>
+            } onClick={() => setWawaState(WawaState.Pet)}>
                 {wawaState === WawaState.Wawa ? (
                     <Image
                         src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png"
@@ -387,6 +388,15 @@ export default function Home() {
                         width={500}
                         height={500}
                         className="animate-wiggle"
+                    />
+                ) : wawaState === WawaState.Pet ? (
+                    <Image
+                        src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/yay.png"
+                        alt="^w^"
+                        width={500}
+                        height={500}
+                        className="animate-wiggle"
+                        priority
                     />
                 ) : wawaState === WawaState.Spent ? (
                     <Image
