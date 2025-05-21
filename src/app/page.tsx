@@ -22,12 +22,16 @@ const Divider: React.FC = () => {
 
 const squeeAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/squee.wav');
 squeeAudio.volume = 0.25;
+
 const sadAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/bwomp.wav');
 sadAudio.volume = 0.25;
+
 const spendAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/kaching.wav');
-spendAudio.volume = 0.25;
+spendAudio.volume = 0.50;
+
 
 export default function Home() {
+    const [mute, setMute] = useState<number>(0);
     const [isClient, setIsClient] = useState(false);
     const [count, setCount] = useState<number>(0); // initialized to 0, will be updated from cookie on client
     const [testing, setTesting] = useState(false); // default to false, updated on client
@@ -43,18 +47,27 @@ export default function Home() {
     // wawa 
     enum WawaState { Normal = 'normal', Wawa = 'wawa', Unwawa = 'unwawa', Recover = 'rewawa', Spent = 'money', Pet = 'yayay' }
     const [wawaState, setWawaState] = useState<WawaState>(WawaState.Normal);
+
     const squeak = () => { 
+        if (mute === 0) {
         squeeAudio.currentTime = 0; 
         squeeAudio.play();
+        }
     }
+
     const bwomp = () => { 
+        if (mute === 0) {
         sadAudio.currentTime = 0;
         sadAudio.play();
+        }
     }
-    const kaching = () => { 
+    const kaching = () => {
+        if (mute === 0) { 
         spendAudio.currentTime = 0;
         spendAudio.play();
+        }
     }
+
     // menus
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [changelogOpen, setChangelogOpen] = useState(false);
@@ -386,9 +399,8 @@ export default function Home() {
                     setTheme(theme === "dark" ? "light" : "dark"); 
                     setCookie('theme', theme === "dark" ? "light" : "dark");
                     }}>Dark/Light Mode - Currently {theme}
-                    <Divider />
                     </Button>
-                    <Divider/>
+                    <Divider />
 
                                        <Button onClick={() => {
                         const wawasValue = getCookie('wawas');
@@ -447,6 +459,12 @@ export default function Home() {
                     <label htmlFor="load-wawa-file" className="cursor-pointer bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded">
                         load stuff from file (.wawa)
                     </label>
+                    <Divider />
+                    <Button onClick={() => { 
+                    setMute(mute === 0 ? 1 : 0);
+                    }}>Mute/Unmute - Currently {mute ? "muted" : "unmuted"}
+                    <Divider />
+                    </Button>
 <Divider/>
 
                 </SheetContent>
