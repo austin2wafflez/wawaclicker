@@ -20,11 +20,16 @@ const Divider: React.FC = () => {
     return <div style={{ height: '13px', visibility: 'hidden' }} />;
 };
 
+const squeeAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/squee.wav');
+squeeAudio.volume = 0.25;
+const sadAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/bwomp.wav');
+sadAudio.volume = 0.25;
+const spendAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/kaching.wav');
+spendAudio.volume = 0.25;
+
 export default function Home() {
     const [isClient, setIsClient] = useState(false);
     const [count, setCount] = useState<number>(0); // initialized to 0, will be updated from cookie on client
-    const [wps, setWps] = useState<string>("0");
-    const [flashRed, setFlashRed] = useState(false);
     const [testing, setTesting] = useState(false); // default to false, updated on client
 
     const { theme, setTheme } = useTheme();
@@ -39,11 +44,17 @@ export default function Home() {
     enum WawaState { Normal = 'normal', Wawa = 'wawa', Unwawa = 'unwawa', Recover = 'rewawa', Spent = 'money', Pet = 'yayay' }
     const [wawaState, setWawaState] = useState<WawaState>(WawaState.Normal);
     const squeak = () => { 
-        const audio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/squee.wav');
-        audio.volume = 0.25;
-        audio.play();
+        squeeAudio.currentTime = 0; 
+        squeeAudio.play();
     }
-
+    const bwomp = () => { 
+        sadAudio.currentTime = 0;
+        sadAudio.play();
+    }
+    const kaching = () => { 
+        spendAudio.currentTime = 0;
+        spendAudio.play();
+    }
     // menus
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [changelogOpen, setChangelogOpen] = useState(false);
@@ -112,30 +123,6 @@ export default function Home() {
         }
     }, [count, isClient]);
 
-    // wps calculations
-    useEffect(() => {
-        if (isClient) {
-            const interval = setInterval(() => {
-                const now = Date.now();
-                setLast5SecondsCounts(prevCounts => prevCounts.filter(time => now - time <= 10000));
-            }, 1000);
-            return () => clearInterval(interval);
-        }
-    }, [isClient]);
-
-    useEffect(() => {
-        if (isClient) {
-            const countInLast5Seconds = last5SecondsCounts.length;
-            const wpsValue = countInLast5Seconds / 10; // Calculate per second over 10s window
-            const currentWpsString = wpsValue.toFixed(2);
-            setWps(prevWps => {
-                const prevWpsNum = parseFloat(prevWps);
-                const currentWpsNum = parseFloat(currentWpsString);
-                return currentWpsNum > prevWpsNum ? currentWpsString : prevWps;
-            });
-        }
-    }, [last5SecondsCounts, isClient]); 
-
     // bot clicky
     useEffect(() => {
         let intervalTimer: NodeJS.Timeout | null = null;
@@ -201,16 +188,17 @@ export default function Home() {
     };
 
     const deincrementCount = () => {
+        bwomp();
         setWawaState(WawaState.Unwawa);
         setCount((prevCount) => prevCount - 1);
     };
 
+    //literally just a half second delay with a sfx but im too lazy to write it each time
+
     const ouchBuy = () => {
-        setWawaState(WawaState.Spent);
-        setFlashRed(true);
+        kaching();
         setTimeout(() => {
-            setFlashRed(false);
-        }, 1000);
+        }, 500);
     };
     
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -227,6 +215,7 @@ export default function Home() {
         } else {
             setBotBuyButtonText("Too Expensive 3:");
             setBotButtonColor("bg-red-500 hover:bg-red-600");
+            bwomp();
             setTimeout(() => {
                 setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
                 setBotButtonColor("bg-green-500 hover:bg-green-600");
@@ -245,6 +234,7 @@ export default function Home() {
         } else {
             setForumBuyButtonText("Too Expensive 3:");
             setForumButtonColor("bg-red-500 hover:bg-red-600");
+            bwomp();
             setTimeout(() => {
                 setForumBuyButtonText("150W$ - ask for wawas on forum - buy nao!!!");
                 setForumButtonColor("bg-green-500 hover:bg-green-600");
@@ -270,10 +260,7 @@ export default function Home() {
                 You have wawa'd
             </h1>
             <motion.div
-                className={`text-6xl md:text-7xl lg:text-8xl font-semibold mb-12 transition-all duration-500 ${flashRed ? 'text-red-500 animate-bounce' : ''
-                    }`}
-                animate={flashRed ? { y: [0, -10, 0] } : {}}
-                transition={flashRed ? { duration: 0.5, repeat: 0 } : {}}
+                className={`text-6xl md:text-7xl lg:text-8xl font-semibold mb-12 transition-all duration-500`}
             >
                 {count < 0 ? (
                     <span className="text-red-500">{count} times...</span>
@@ -285,9 +272,6 @@ export default function Home() {
                     </>
                 )}
             </motion.div>
-            <div className="w-full flex justify-left">
-                <div className="text-xs text-gray-500">{wps} wawas per second</div>
-            </div>
 
             <div className="flex space-x-4 relative">
                 <Button
