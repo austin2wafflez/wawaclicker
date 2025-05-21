@@ -32,7 +32,7 @@ export default function Home() {
     // shop buttons
     const [botBuyButtonText, setBotBuyButtonText] = useState("30W$ - wawabot3000 - buy nao!!!");
     const [botButtonColor, setBotButtonColor] = useState<"default" | "destructive">("default");
-    const [forumBuyButtonText, setForumBuyButtonText] = useState("150W$ - wawa forum membership - buy nao!!!");
+    const [forumBuyButtonText, setForumBuyButtonText] = useState("150W$ - wawa forum buds - buy nao!!!");
     const [forumButtonColor, setForumButtonColor] = useState<"default" | "destructive">("default");
 
 
@@ -49,7 +49,7 @@ export default function Home() {
     const [forumClicking, setForumClicking] = useState<number>(0);
 
     // image positioning state
-    const [imagePositionClass, setImagePositionClass] = useState("absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500");
+    const [imagePositionClass, setImagePositionClass] = useState("absolute bottom-0 left-1/2 -translate-x-1/2 transition-all duration-500");
 
     useEffect(() => {
         setIsClient(true);
@@ -95,19 +95,19 @@ export default function Home() {
             if (isMobileDevice || count < 0 || window.innerWidth < 906) {
                 setImagePositionClass("absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500");
             } else {
-                setImagePositionClass("absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500");
+                setImagePositionClass("absolute right-0 bottom-0 -translate-y-1/2 transition-all duration-500");
             }
         };
         updateImagePos();
         window.addEventListener('resize', updateImagePos);
         return () => window.removeEventListener('resize', updateImagePos);
 
-    }, [setTheme, theme, count]); // Added count to dependencies for image position update
+    }, [setTheme, theme]);
 
     // title
     useEffect(() => {
         if (isClient) {
-            document.title = `Tap Counter - ${count} Taps`;
+            document.title = `clickclick - ${count} wawas`;
         }
     }, [count, isClient]);
 
@@ -154,9 +154,6 @@ export default function Home() {
         setCount((prevCount) => prevCount + 1);
         setWawaState(WawaState.Pet);
         playSound(squeeAudio);
-         setTimeout(() => {
-            if (wawaState === WawaState.Pet) setWawaState(WawaState.Normal);
-        }, 350);
     };
 
     const incrementCount = () => {
@@ -172,9 +169,6 @@ export default function Home() {
         setCount((prevCount) => prevCount - 1);
         playSound(sadAudio);
         setWawaState(WawaState.Unwawa);
-         setTimeout(() => {
-            if (wawaState === WawaState.Unwawa) setWawaState(WawaState.Normal);
-        }, 150);
     }
 
     const artiCount = () => {
@@ -184,9 +178,6 @@ export default function Home() {
     const ouchBuy = () => {
         playSound(spendAudio);
         setWawaState(WawaState.Spent);
-        setTimeout(() => {
-          if (wawaState === WawaState.Spent) setWawaState(WawaState.Normal);
-        }, 500);
     };
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -198,14 +189,14 @@ export default function Home() {
             setBotClicking((prevClicking) => prevClicking + 1);
             setBotBuyButtonText("Bought!");
             ouchBuy();
-            setTimeout(() => setBotBuyButtonText("30 Taps - TapperBot3000 - buy now!"), 1000);
+            setTimeout(() => setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!"), 1000);
             setBotButtonColor("default");
         } else {
             setBotBuyButtonText("Too Expensive :(");
             setBotButtonColor("destructive");
             playSound(sadAudio);
             setTimeout(() => {
-                setBotBuyButtonText("30 Taps - TapperBot3000 - buy now!");
+                setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
                 setBotButtonColor("default");
             }, 1000);
         }
@@ -217,14 +208,14 @@ export default function Home() {
             setForumClicking((prevClicking) => prevClicking + 1);
             setForumBuyButtonText("Bought!");
             ouchBuy();
-            setTimeout(() => setForumBuyButtonText("150 Taps - Forum Membership - buy now!"), 1000);
+            setTimeout(() => setForumBuyButtonText("150W$ - wawa forum buds - buy nao!!!"), 1000);
             setForumButtonColor("default");
         } else {
             setForumBuyButtonText("Too Expensive :(");
             setForumButtonColor("destructive");
             playSound(sadAudio);
             setTimeout(() => {
-                setForumBuyButtonText("150 Taps - Forum Membership - buy now!");
+                setForumBuyButtonText("150W$ - wawa forum buds - buy nao!!!");
                 setForumButtonColor("default");
             }, 1000);
         }
@@ -232,7 +223,7 @@ export default function Home() {
 
 
     if (!isClient) {
-        return <div className="flex items-center justify-center min-h-screen w-full"><p>Loading...</p></div>;
+        return <div className="flex items-center justify-center min-h-screen w-full"><p>waking wawa up...</p></div>;
     }
     
     const wawaImageSrc = wawaState === WawaState.Wawa ? "https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/wa.png"
@@ -251,7 +242,7 @@ export default function Home() {
 
 
     return (
-        <div className="flex flex-col items-start text-left min-h-screen p-4 relative w-full max-w-5xl mx-auto">
+        <div className="flex flex-col bottom-0 items-start text-left min-h-screen p-4 relative w-full max-w-5xl mx-auto items-center position-fixed">
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
                 You have wawa'd
             </h1>
@@ -265,7 +256,7 @@ export default function Home() {
                 {count < 0 ? `${count} times...` : `${count} times!`}
             </motion.div>
 
-            <div className="flex justify-start space-x-4 mb-8">
+            <div className="flex justify-start space-x-4 mb-8 items-center">
                 <Button
                     variant="default"
                     size="lg"
@@ -284,13 +275,13 @@ export default function Home() {
                 </Button>
             </div>
             
-            <div className={`${imagePositionClass} cursor-pointer`} onClick={incrementCountByPet} data-ai-hint="cat happy">
+            <div className={`${imagePositionClass} cursor-pointer`} onClick={incrementCountByPet}>
                  <Image
                     src={wawaImageSrc}
                     alt={wawaImageAlt}
                     width={isMobileDevice ? 150 : 250}
                     height={isMobileDevice ? 150 : 250}
-                    className={`${wawaImageAnimation} ${theme === "dark" && wawaState !== WawaState.Spent ? "invert" : ""}`}
+                    className={`${wawaImageAnimation} ${theme === "dark" ? "invert" : ""}`}
                     priority
                     unoptimized
                 />
@@ -306,7 +297,7 @@ export default function Home() {
                 </SheetTrigger>
                 <SheetContent side="right" className="bg-background/95 backdrop-blur-sm">
                      <div className="p-4">
-                        <h4 className="text-xl font-semibold text-center mb-4">The Shoppe</h4>
+                        <h4 className="text-xl font-semibold text-center mb-4">The Shoppe~</h4>
                         <div className="flex flex-col gap-4">
                             <Button variant={botButtonColor} className="font-semibold" onClick={handleBotBuyButtonClick}>
                                 {botBuyButtonText}
@@ -340,7 +331,7 @@ export default function Home() {
                 </SheetTrigger>
                 <SheetContent side="left" className="bg-background/95 backdrop-blur-sm">
                     <div className="p-4">
-                        <h4 className="text-xl font-semibold text-center mb-6">Settings</h4>
+                        <h4 className="text-xl font-semibold text-center mb-6">Settoing</h4>
                         <div className="flex flex-col gap-4">
                             <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
                                 Theme: {theme === "dark" ? "Dark" : "Light"}
@@ -420,12 +411,12 @@ export default function Home() {
 
             <div className="absolute bottom-4 w-full text-center text-muted-foreground text-sm">
                 {testing ? (
-                    <a href="https://tap-counter-app.web.app" className="underline" target="_blank" rel="noopener noreferrer">
-                    (Testing Build) Go to Stable
+                    <a href="https://wawa-clicker.web.app" className="underline" target="_blank" rel="noopener noreferrer">
+                    (Testing Build) go to stabler grounds!!
                 </a>
                 ) : (
                      <a href="https://9002-idx-studio-1745504646182.cluster-rhptpnrfenhe4qarq36djxjqmg.cloudworkstations.dev/" className="underline" target="_blank" rel="noopener noreferrer">
-                        (Stable Build) Go to Testing
+                        (Stable Build) play in the mud!!
                     </a>
                 )}
             </div>
