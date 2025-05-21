@@ -304,7 +304,7 @@ export default function Home() {
             <div className={imagePositionClass} onClick={incrementCountByPet}>
                 {wawaState === WawaState.Wawa ? (
  <Image
- src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/wa.png"
+ src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/wa.png"
  alt=":D"
  width={500}
  height={500}
@@ -314,7 +314,7 @@ export default function Home() {
  />
                 ) : wawaState === WawaState.Unwawa ? (
  <Image
- src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sad.png"
+ src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/sad.png"
  alt=":("
  width={500}
  height={500}
@@ -323,7 +323,7 @@ export default function Home() {
  />
                 ) : wawaState === WawaState.Pet ? (
  <Image
- src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/yay.png"
+ src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/yay.png"
  alt="^w^"
  width={500}
  height={500}
@@ -333,7 +333,7 @@ export default function Home() {
  />
                 ) : wawaState === WawaState.Spent ? (
  <Image
- src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/spent.png"
+ src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/spent.png"
  alt=":3 $"
  width={500}
  height={500}
@@ -342,7 +342,7 @@ export default function Home() {
  unoptimized
  />
                 ) : (
- <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/aw.png" alt=":3" width={500} height={500} className={theme === "dark" ? "invert" : ""} unoptimized />
+ <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/aw.png" alt=":3" width={500} height={500} className={theme === "dark" ? "invert" : ""} unoptimized />
                 )}
             </div>
 
@@ -468,7 +468,7 @@ export default function Home() {
                     </a>
                 ) : (
                     <a href="https://9000-idx-studio-1745504646182.cluster-rhptpnrfenhe4qarq36djxjqmg.cloudworkstations.dev/?monospaceUid=572770" className="underline" target="_blank" rel="noopener noreferrer">
-                        wanna try stuff AS I ADD IT? click here!! (warning - breaks often)
+                        wanna try stuff AS I ADD IT? click here!! (warning - breaks often, subject to going down when i'm not working)
                     </a>
                 )}
             </div>
