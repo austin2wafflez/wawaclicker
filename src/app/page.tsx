@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { getCookie, setCookie } from "cookies-next"; // Using cookies-next
+import { getCookie, setCookie } from "cookies-next";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { FaShoppingCart, FaCog } from "react-icons/fa";
 import { FiFileText } from "react-icons/fi";
@@ -15,11 +15,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/compon
 import { isMobile as isMobileDevice } from "react-device-detect";
 import { motion } from "framer-motion";
 
-const Divider: React.FC = () => {
-    return <div style={{ height: '13px', visibility: 'hidden' }} />;
-};
-
-// Audio setup needs to be client-side
+// audio stuff is clientside
 let squeeAudio: HTMLAudioElement | null = null;
 let sadAudio: HTMLAudioElement | null = null;
 let spendAudio: HTMLAudioElement | null = null;
@@ -36,7 +32,7 @@ export default function Home() {
     // shop buttons
     const [botBuyButtonText, setBotBuyButtonText] = useState("30W$ - wawabot3000 - buy nao!!!");
     const [botButtonColor, setBotButtonColor] = useState<"default" | "destructive">("default");
-    const [forumBuyButtonText, setForumBuyButtonText] = useState("150W$ - ask for wawas on forum - buy nao!!!");
+    const [forumBuyButtonText, setForumBuyButtonText] = useState("150W$ - wawa forum membership - buy nao!!!");
     const [forumButtonColor, setForumButtonColor] = useState<"default" | "destructive">("default");
 
 
@@ -58,7 +54,7 @@ export default function Home() {
     useEffect(() => {
         setIsClient(true);
 
-        // Initialize audio objects on client
+        // Initialize audio on client
         squeeAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/squee.wav');
         squeeAudio.volume = 0.25;
         sadAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/bwomp.wav');
@@ -66,32 +62,31 @@ export default function Home() {
         spendAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/kaching.wav');
         spendAudio.volume = 0.50;
 
-
-        const storedCount = getCookie('wawas_count'); // Changed cookie name for clarity
+        const storedCount = getCookie('tap_counter_count');
         setCount(storedCount ? parseInt(storedCount as string, 10) : 0);
 
-        const storedTheme = getCookie('app_theme'); // Changed cookie name
+        const storedTheme = getCookie('app_theme');
         if (storedTheme) {
             setTheme(storedTheme as string);
-        } else if (theme !== 'dark' && theme !== 'light') { // Ensure a default if system isn't explicitly dark/light
+        } else if (theme !== 'dark' && theme !== 'light') {
              setTheme('light');
         }
 
+        setTesting(window.location.hostname !== 'wawa-clicker.web.app' && window.location.hostname !== 'tap-counter-app.web.app');
 
-        setTesting(window.location.hostname !== 'wawa-clicker.web.app' && window.location.hostname !== 'tap-counter-app.web.app' ); // Adjusted for new app name
 
-        const storedBotCount = getCookie('wawabots_count');
+        const storedBotCount = getCookie('tap_counter_bots');
         setBotClicking(storedBotCount ? parseInt(storedBotCount as string, 10) : 0);
 
-        const storedForumCount = getCookie('wawaforums_count');
+        const storedForumCount = getCookie('tap_counter_forums');
         setForumClicking(storedForumCount ? parseInt(storedForumCount as string, 10) : 0);
 
         const storedMute = getCookie('app_mute');
         setMute(storedMute ? parseInt(storedMute as string, 10) : 0);
 
-        const dataLoadedAlertShownKey = 'dataLoadedAlertShown';
+        const dataLoadedAlertShownKey = 'dataLoadedAlertShown_tap_counter';
         const alertShown = getCookie(dataLoadedAlertShownKey);
-        if (storedCount && !alertShown) {
+        if ((storedCount || storedBotCount || storedForumCount) && !alertShown) {
             toast.success("Data loaded successfully! :3");
             setCookie(dataLoadedAlertShownKey, 'true', { maxAge: 60 * 60 * 24, path: '/' });
         }
@@ -107,19 +102,19 @@ export default function Home() {
         window.addEventListener('resize', updateImagePos);
         return () => window.removeEventListener('resize', updateImagePos);
 
-    }, [setTheme]); // Only run once on client mount, setTheme is stable
+    }, [setTheme, theme, count]); // Added count to dependencies for image position update
 
     // title
     useEffect(() => {
         if (isClient) {
-            document.title = `Tap Counter - ${count} taps`;
+            document.title = `Tap Counter - ${count} Taps`;
         }
     }, [count, isClient]);
 
-    // Save states to cookies when they change
-    useEffect(() => { if (isClient) setCookie('wawas_count', count.toString(), { path: '/' }); }, [count, isClient]);
-    useEffect(() => { if (isClient) setCookie('wawabots_count', botClicking.toString(), { path: '/' }); }, [botClicking, isClient]);
-    useEffect(() => { if (isClient) setCookie('wawaforums_count', forumClicking.toString(), { path: '/' }); }, [forumClicking, isClient]);
+    // cookies
+    useEffect(() => { if (isClient) setCookie('tap_counter_count', count.toString(), { path: '/' }); }, [count, isClient]);
+    useEffect(() => { if (isClient) setCookie('tap_counter_bots', botClicking.toString(), { path: '/' }); }, [botClicking, isClient]);
+    useEffect(() => { if (isClient) setCookie('tap_counter_forums', forumClicking.toString(), { path: '/' }); }, [forumClicking, isClient]);
     useEffect(() => { if (isClient) setCookie('app_mute', mute.toString(), { path: '/' }); }, [mute, isClient]);
     useEffect(() => { if (isClient && theme) setCookie('app_theme', theme, { path: '/' }); }, [theme, isClient]);
 
@@ -159,9 +154,9 @@ export default function Home() {
         setCount((prevCount) => prevCount + 1);
         setWawaState(WawaState.Pet);
         playSound(squeeAudio);
-        setTimeout(() => {
+         setTimeout(() => {
             if (wawaState === WawaState.Pet) setWawaState(WawaState.Normal);
-        }, 300);
+        }, 350);
     };
 
     const incrementCount = () => {
@@ -173,13 +168,13 @@ export default function Home() {
         }, 150);
     };
     
-    const resetCount = () => {
-        setCount(0);
+    const deincrementCount = () => {
+        setCount((prevCount) => prevCount - 1);
         playSound(sadAudio);
         setWawaState(WawaState.Unwawa);
          setTimeout(() => {
             if (wawaState === WawaState.Unwawa) setWawaState(WawaState.Normal);
-        }, 300);
+        }, 150);
     }
 
     const artiCount = () => {
@@ -203,14 +198,14 @@ export default function Home() {
             setBotClicking((prevClicking) => prevClicking + 1);
             setBotBuyButtonText("Bought!");
             ouchBuy();
-            setTimeout(() => setBotBuyButtonText("30 W$ - Auto Clicker Tier 1"), 1000);
+            setTimeout(() => setBotBuyButtonText("30 Taps - TapperBot3000 - buy now!"), 1000);
             setBotButtonColor("default");
         } else {
-            setBotBuyButtonText("Too Expensive 3:");
+            setBotBuyButtonText("Too Expensive :(");
             setBotButtonColor("destructive");
             playSound(sadAudio);
             setTimeout(() => {
-                setBotBuyButtonText("30 W$ - Auto Clicker Tier 1");
+                setBotBuyButtonText("30 Taps - TapperBot3000 - buy now!");
                 setBotButtonColor("default");
             }, 1000);
         }
@@ -222,14 +217,14 @@ export default function Home() {
             setForumClicking((prevClicking) => prevClicking + 1);
             setForumBuyButtonText("Bought!");
             ouchBuy();
-            setTimeout(() => setForumBuyButtonText("150 W$ - Auto Clicker Tier 2"), 1000);
+            setTimeout(() => setForumBuyButtonText("150 Taps - Forum Membership - buy now!"), 1000);
             setForumButtonColor("default");
         } else {
-            setForumBuyButtonText("Too Expensive 3:");
+            setForumBuyButtonText("Too Expensive :(");
             setForumButtonColor("destructive");
             playSound(sadAudio);
             setTimeout(() => {
-                setForumBuyButtonText("150 W$ - Auto Clicker Tier 2");
+                setForumBuyButtonText("150 Taps - Forum Membership - buy now!");
                 setForumButtonColor("default");
             }, 1000);
         }
@@ -237,7 +232,7 @@ export default function Home() {
 
 
     if (!isClient) {
-        return <div className="flex items-center justify-center min-h-screen w-full"><p>Loading...</p></div>; // Or a loading spinner
+        return <div className="flex items-center justify-center min-h-screen w-full"><p>Loading...</p></div>;
     }
     
     const wawaImageSrc = wawaState === WawaState.Wawa ? "https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/wa.png"
@@ -256,64 +251,62 @@ export default function Home() {
 
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 relative">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-center">
-                Tap Counter
+        <div className="flex flex-col items-start text-left min-h-screen p-4 relative w-full max-w-5xl mx-auto">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+                You have wawa'd
             </h1>
             <motion.div
-                key={count} // Add key to force re-render on count change for animation
-                initial={{ scale: count > 0 ? 1.1 : 1 }} // Slightly larger scale for increment
+                key={count} 
+                initial={{ scale: count > 0 ? 1.1 : 1 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                className="text-7xl md:text-8xl font-semibold mb-10 text-center"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                className={`text-7xl md:text-8xl font-semibold mb-10 text-left ${count < 0 ? 'text-red-500' : ''} whitespace-nowrap`}
             >
-                {count}
+                {count < 0 ? `${count} times...` : `${count} times!`}
             </motion.div>
 
-            <div className="flex space-x-4 mb-8">
+            <div className="flex justify-start space-x-4 mb-8">
                 <Button
                     variant="default"
                     size="lg"
                     className="px-8 py-4 text-xl rounded-lg shadow-md active:scale-95 transition-transform"
                     onClick={incrementCount}
                 >
-                    Increment
+                    Wawa :3
                 </Button>
                 <Button
-                    variant="default" // Changed to default to use primary (Teal)
+                    variant="destructive" 
                     size="lg"
                     className="px-8 py-4 text-xl rounded-lg shadow-md active:scale-95 transition-transform"
-                    onClick={resetCount}
+                    onClick={deincrementCount}
                 >
-                    Reset
+                    Unwawa 3:
                 </Button>
             </div>
             
-            {/* Wawa Image as a clickable pet */}
-            <div className={`${imagePositionClass} cursor-pointer`} onClick={incrementCountByPet} data-ai-hint="cute cat">
+            <div className={`${imagePositionClass} cursor-pointer`} onClick={incrementCountByPet} data-ai-hint="cat happy">
                  <Image
                     src={wawaImageSrc}
                     alt={wawaImageAlt}
                     width={isMobileDevice ? 150 : 250}
                     height={isMobileDevice ? 150 : 250}
-                    className={`${wawaImageAnimation} ${theme === "dark" && wawaState !== WawaState.Spent ? "invert" : ""}`} // Only invert non-spent wawa in dark mode
+                    className={`${wawaImageAnimation} ${theme === "dark" && wawaState !== WawaState.Spent ? "invert" : ""}`}
                     priority
                     unoptimized
                 />
             </div>
 
 
-            {/* Shop Button */}
             <Sheet open={isMenuOpen} onOpenChange={toggleMenu}>
                 <SheetTrigger asChild>
                     <Button variant="ghost" size="icon" className="absolute right-4 top-4 z-50">
                         <FaShoppingCart size={24} />
-                         <span className="sr-only">Open Shop</span>
+                         <span className="sr-only">Shop</span>
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="bg-background/95 backdrop-blur-sm">
                      <div className="p-4">
-                        <h4 className="text-xl font-semibold text-center mb-4">The Shoppe~</h4>
+                        <h4 className="text-xl font-semibold text-center mb-4">The Shoppe</h4>
                         <div className="flex flex-col gap-4">
                             <Button variant={botButtonColor} className="font-semibold" onClick={handleBotBuyButtonClick}>
                                 {botBuyButtonText}
@@ -326,25 +319,23 @@ export default function Home() {
                 </SheetContent>
             </Sheet>
 
-            {/* Changelog Button */}
             <DropdownMenu open={changelogOpen} onOpenChange={setChangelogOpen}>
                 <DropdownMenuTrigger asChild>
                      <Button variant="ghost" size="icon" className="absolute right-16 top-4 z-50">
                         <FiFileText size={24} />
-                        <span className="sr-only">Open Changelog</span>
+                        <span className="sr-only">Changelog</span>
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="p-0 w-[clamp(300px,80vw,500px)] h-[clamp(300px,70vh,600px)]" align="end">
-                    <iframe src="changelog.html" className="w-full h-full border-0 rounded-md"></iframe>
+                    <iframe src="https://austin2wafflez.github.io/wawaclicker/changelog.html" className="w-full h-full border-0 rounded-md"></iframe>
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Settings Button */}
             <Sheet open={isSettingsOpen} onOpenChange={toggleSettings}>
                 <SheetTrigger asChild>
                      <Button variant="ghost" size="icon" className="absolute right-28 top-4 z-50">
                         <FaCog size={24} />
-                         <span className="sr-only">Open Settings</span>
+                         <span className="sr-only">Settings</span>
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="bg-background/95 backdrop-blur-sm">
@@ -352,20 +343,18 @@ export default function Home() {
                         <h4 className="text-xl font-semibold text-center mb-6">Settings</h4>
                         <div className="flex flex-col gap-4">
                             <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-                                Toggle Theme: Currently {theme === "dark" ? "Dark" : "Light"}
+                                Theme: {theme === "dark" ? "Dark" : "Light"}
                             </Button>
                              <Button onClick={() => setMute(prev => prev === 0 ? 1 : 0)}>
                                 {mute === 0 ? "Mute Sounds" : "Unmute Sounds"}
                             </Button>
 
                             <Button onClick={() => {
-                                const wawasValue = getCookie('wawas_count') || '0';
-                                const botsValue = getCookie('wawabots_count') || '0';
-                                const forumsValue = getCookie('wawaforums_count') || '0';
-                                const themeValue = getCookie('app_theme') || 'light';
-                                const muteValue = getCookie('app_mute') || '0';
+                                const wawasValue = getCookie('tap_counter_count') || '0';
+                                const botsValue = getCookie('tap_counter_bots') || '0';
+                                const forumsValue = getCookie('tap_counter_forums') || '0';
 
-                                const saveContent = `wawa-${wawasValue}\nbots-${botsValue}\nforums-${forumsValue}\ntheme-${themeValue}\nmute-${muteValue}`;
+                                const saveContent = `wawa-${wawasValue}\nbots-${botsValue}\nforums-${forumsValue}`;
                                 const blob = new Blob([saveContent], { type: 'text/plain' });
                                 const url = URL.createObjectURL(blob);
                                 const link = document.createElement('a');
@@ -390,31 +379,22 @@ export default function Home() {
                                                 let newWawas = count;
                                                 let newBots = botClicking;
                                                 let newForums = forumClicking;
-                                                let newTheme = theme;
-                                                let newMute = mute;
 
                                                 lines.forEach(line => {
                                                     if (line.startsWith('wawa-')) newWawas = parseInt(line.substring('wawa-'.length));
                                                     else if (line.startsWith('bots-')) newBots = parseInt(line.substring('bots-'.length));
                                                     else if (line.startsWith('forums-')) newForums = parseInt(line.substring('forums-'.length));
-                                                    else if (line.startsWith('theme-')) newTheme = line.substring('theme-'.length);
-                                                    else if (line.startsWith('mute-')) newMute = parseInt(line.substring('mute-'.length));
                                                 });
 
                                                 setCount(newWawas);
                                                 setBotClicking(newBots);
                                                 setForumClicking(newForums);
-                                                if(newTheme) setTheme(newTheme);
-                                                setMute(newMute);
                                                 
-                                                // Also update cookies immediately
-                                                setCookie('wawas_count', newWawas.toString(), { path: '/' });
-                                                setCookie('wawabots_count', newBots.toString(), { path: '/' });
-                                                setCookie('wawaforums_count', newForums.toString(), { path: '/' });
-                                                if(newTheme) setCookie('app_theme', newTheme, { path: '/' });
-                                                setCookie('app_mute', newMute.toString(), { path: '/' });
+                                                setCookie('tap_counter_count', newWawas.toString(), { path: '/' });
+                                                setCookie('tap_counter_bots', newBots.toString(), { path: '/' });
+                                                setCookie('tap_counter_forums', newForums.toString(), { path: '/' });
 
-                                                toast.success("Data loaded from file! Reloading...");
+                                                toast.success("Data loaded from file! Reloading page...");
                                                 setTimeout(() => window.location.reload(), 1500);
                                             } catch (err) {
                                                 toast.error("Failed to load save file. It might be corrupted.");
@@ -441,14 +421,15 @@ export default function Home() {
             <div className="absolute bottom-4 w-full text-center text-muted-foreground text-sm">
                 {testing ? (
                     <a href="https://tap-counter-app.web.app" className="underline" target="_blank" rel="noopener noreferrer">
-                        View stable build
-                    </a>
+                    (Testing Build) Go to Stable
+                </a>
                 ) : (
-                     <a href="https://wawa-clicker.web.app" className="underline" target="_blank" rel="noopener noreferrer">
-                        You are on the stable build. (Old link, dev build may be unavailable)
+                     <a href="https://9002-idx-studio-1745504646182.cluster-rhptpnrfenhe4qarq36djxjqmg.cloudworkstations.dev/" className="underline" target="_blank" rel="noopener noreferrer">
+                        (Stable Build) Go to Testing
                     </a>
                 )}
             </div>
         </div>
     );
 }
+
