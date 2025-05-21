@@ -7,66 +7,41 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { getCookie, setCookie } from "cookies-next";
+import { getCookie, setCookie } from "cookies-next"; // Using cookies-next
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { FaShoppingCart } from "react-icons/fa";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { isMobile as isMobileDevice } from "react-device-detect"; 
-import { motion } from "framer-motion";
+import { FaShoppingCart, FaCog } from "react-icons/fa";
 import { FiFileText } from "react-icons/fi";
-import { FaCog } from "react-icons/fa";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { isMobile as isMobileDevice } from "react-device-detect";
+import { motion } from "framer-motion";
 
 const Divider: React.FC = () => {
     return <div style={{ height: '13px', visibility: 'hidden' }} />;
 };
 
-const squeeAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/squee.wav');
-squeeAudio.volume = 0.25;
-
-const sadAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/bwomp.wav');
-sadAudio.volume = 0.25;
-
-const spendAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/kaching.wav');
-spendAudio.volume = 0.50;
+// Audio setup needs to be client-side
+let squeeAudio: HTMLAudioElement | null = null;
+let sadAudio: HTMLAudioElement | null = null;
+let spendAudio: HTMLAudioElement | null = null;
 
 
 export default function Home() {
-    const [mute, setMute] = useState<number>(0);
+    const [count, setCount] = useState<number>(0);
+    const [mute, setMute] = useState<number>(0); // 0 for unmuted, 1 for muted
     const [isClient, setIsClient] = useState(false);
-    const [count, setCount] = useState<number>(0); // initialized to 0, will be updated from cookie on client
-    const [testing, setTesting] = useState(false); // default to false, updated on client
+    const [testing, setTesting] = useState(false);
 
     const { theme, setTheme } = useTheme();
 
     // shop buttons
     const [botBuyButtonText, setBotBuyButtonText] = useState("30W$ - wawabot3000 - buy nao!!!");
-    const [botButtonColor, setBotButtonColor] = useState("bg-green-500 hover:bg-green-600");
+    const [botButtonColor, setBotButtonColor] = useState<"default" | "destructive">("default");
     const [forumBuyButtonText, setForumBuyButtonText] = useState("150W$ - ask for wawas on forum - buy nao!!!");
-    const [forumButtonColor, setForumButtonColor] = useState("bg-green-500 hover:bg-green-600");
+    const [forumButtonColor, setForumButtonColor] = useState<"default" | "destructive">("default");
 
-    // wawa 
+
     enum WawaState { Normal = 'normal', Wawa = 'wawa', Unwawa = 'unwawa', Recover = 'rewawa', Spent = 'money', Pet = 'yayay' }
     const [wawaState, setWawaState] = useState<WawaState>(WawaState.Normal);
-
-    const squeak = () => { 
-        if (mute === 0) {
-        squeeAudio.currentTime = 0; 
-        squeeAudio.play();
-        }
-    }
-
-    const bwomp = () => { 
-        if (mute === 0) {
-        sadAudio.currentTime = 0;
-        sadAudio.play();
-        }
-    }
-    const kaching = () => {
-        if (mute === 0) { 
-        spendAudio.currentTime = 0;
-        spendAudio.play();
-        }
-    }
 
     // menus
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -77,64 +52,77 @@ export default function Home() {
     const [botClicking, setBotClicking] = useState<number>(0);
     const [forumClicking, setForumClicking] = useState<number>(0);
 
-    // calc helper
-    const [last5SecondsCounts, setLast5SecondsCounts] = useState<number[]>([]);
-
     // image positioning state
     const [imagePositionClass, setImagePositionClass] = useState("absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500");
 
-    // this effect runs once on mount on the client side
     useEffect(() => {
         setIsClient(true);
 
-        const storedCount = getCookie('wawas');
+        // Initialize audio objects on client
+        squeeAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/squee.wav');
+        squeeAudio.volume = 0.25;
+        sadAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/bwomp.wav');
+        sadAudio.volume = 0.25;
+        spendAudio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/kaching.wav');
+        spendAudio.volume = 0.50;
+
+
+        const storedCount = getCookie('wawas_count'); // Changed cookie name for clarity
         setCount(storedCount ? parseInt(storedCount as string, 10) : 0);
 
-        if (theme !== 'dark') {
-        const storedTheme = getCookie('theme');
+        const storedTheme = getCookie('app_theme'); // Changed cookie name
         if (storedTheme) {
             setTheme(storedTheme as string);
-        } else {
-                setTheme('light');
-            }
+        } else if (theme !== 'dark' && theme !== 'light') { // Ensure a default if system isn't explicitly dark/light
+             setTheme('light');
         }
 
-        setTesting(window.location.hostname !== 'wawa-clicker.web.app');
-        
-        const storedBotCount = getCookie('wawabots');
+
+        setTesting(window.location.hostname !== 'wawa-clicker.web.app' && window.location.hostname !== 'tap-counter-app.web.app' ); // Adjusted for new app name
+
+        const storedBotCount = getCookie('wawabots_count');
         setBotClicking(storedBotCount ? parseInt(storedBotCount as string, 10) : 0);
-        const storedForumCount = getCookie('wawaforums');
+
+        const storedForumCount = getCookie('wawaforums_count');
         setForumClicking(storedForumCount ? parseInt(storedForumCount as string, 10) : 0);
+
+        const storedMute = getCookie('app_mute');
+        setMute(storedMute ? parseInt(storedMute as string, 10) : 0);
 
         const dataLoadedAlertShownKey = 'dataLoadedAlertShown';
         const alertShown = getCookie(dataLoadedAlertShownKey);
-        const storedCountCookie = getCookie('wawas');
-        if (storedCountCookie && !alertShown) {
-            if (isMobileDevice) {
-                toast.success("data loaded :3");
+        if (storedCount && !alertShown) {
+            toast.success("Data loaded successfully! :3");
+            setCookie(dataLoadedAlertShownKey, 'true', { maxAge: 60 * 60 * 24, path: '/' });
+        }
+
+        const updateImagePos = () => {
+            if (isMobileDevice || count < 0 || window.innerWidth < 906) {
+                setImagePositionClass("absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500");
             } else {
-                window.alert("data loaded :3");
+                setImagePositionClass("absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500");
             }
-            setCookie(dataLoadedAlertShownKey, 'true', { maxAge: 60 * 60 * 24 }); // Show once per day
-        }
-    }, [setTheme]); // setTheme is stable, so this runs effectively once on client mount
+        };
+        updateImagePos();
+        window.addEventListener('resize', updateImagePos);
+        return () => window.removeEventListener('resize', updateImagePos);
 
-    //  title
+    }, [setTheme]); // Only run once on client mount, setTheme is stable
+
+    // title
     useEffect(() => {
         if (isClient) {
-            const interval = setInterval(() => {
-                document.title = `clickclick - ${count} wawas`;
-            }, 10);
-            return () => clearInterval(interval);
+            document.title = `Tap Counter - ${count} taps`;
         }
     }, [count, isClient]);
 
-    // save counting
-    useEffect(() => {
-        if (isClient) {
-            setCookie('wawas', count.toString());
-        }
-    }, [count, isClient]);
+    // Save states to cookies when they change
+    useEffect(() => { if (isClient) setCookie('wawas_count', count.toString(), { path: '/' }); }, [count, isClient]);
+    useEffect(() => { if (isClient) setCookie('wawabots_count', botClicking.toString(), { path: '/' }); }, [botClicking, isClient]);
+    useEffect(() => { if (isClient) setCookie('wawaforums_count', forumClicking.toString(), { path: '/' }); }, [forumClicking, isClient]);
+    useEffect(() => { if (isClient) setCookie('app_mute', mute.toString(), { path: '/' }); }, [mute, isClient]);
+    useEffect(() => { if (isClient && theme) setCookie('app_theme', theme, { path: '/' }); }, [theme, isClient]);
+
 
     // bot clicky
     useEffect(() => {
@@ -159,61 +147,53 @@ export default function Home() {
         return () => { if (intervalTimer) clearInterval(intervalTimer); };
     }, [forumClicking, isClient]);
 
-    // Shop item save effects
-    useEffect(() => { if (isClient) setCookie('wawaforums', forumClicking.toString()); }, [forumClicking, isClient]);
-    useEffect(() => { if (isClient) setCookie('wawabots', botClicking.toString()); }, [botClicking, isClient]);
 
-    // Image positioning effect
-     useEffect(() => {
-        if (isClient) {
-            const updateImagePosition = () => {
-                if (isMobileDevice || count < 0 || window.innerWidth < 906) {
-                    setImagePositionClass("absolute top-0 left-1/2 -translate-x-1/2 transition-all duration-500");
-                } else {
-                    setImagePositionClass("absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-500");
-                }
-            };
-            updateImagePosition();
-            window.addEventListener('resize', updateImagePosition);
-            return () => window.removeEventListener('resize', updateImagePosition);
+    const playSound = (audioElement: HTMLAudioElement | null) => {
+        if (isClient && audioElement && mute === 0) {
+            audioElement.currentTime = 0;
+            audioElement.play().catch(error => console.error("Error playing sound:", error));
         }
-    }, [isClient, isMobileDevice, count]);
-
+    }
 
     const incrementCountByPet = () => {
         setCount((prevCount) => prevCount + 1);
         setWawaState(WawaState.Pet);
-        squeak();
+        playSound(squeeAudio);
+        setTimeout(() => {
+            if (wawaState === WawaState.Pet) setWawaState(WawaState.Normal);
+        }, 300);
     };
 
     const incrementCount = () => {
         setCount((prevCount) => prevCount + 1);
         setWawaState(WawaState.Wawa);
-        squeak();
+        playSound(squeeAudio);
         setTimeout(() => {
-            setWawaState(WawaState.Normal);
+            if (wawaState === WawaState.Wawa) setWawaState(WawaState.Normal);
         }, 150);
     };
+    
+    const resetCount = () => {
+        setCount(0);
+        playSound(sadAudio);
+        setWawaState(WawaState.Unwawa);
+         setTimeout(() => {
+            if (wawaState === WawaState.Unwawa) setWawaState(WawaState.Normal);
+        }, 300);
+    }
 
     const artiCount = () => {
         setCount((prevCount) => prevCount + 1);
-        setLast5SecondsCounts((prevCounts) => [...prevCounts, Date.now()]);
-    };
-
-    const deincrementCount = () => {
-        bwomp();
-        setWawaState(WawaState.Unwawa);
-        setCount((prevCount) => prevCount - 1);
-    };
-
-    //literally just a half second delay with a sfx but im too lazy to write it each time
-
-    const ouchBuy = () => {
-        kaching();
-        setTimeout(() => {
-        }, 500);
     };
     
+    const ouchBuy = () => {
+        playSound(spendAudio);
+        setWawaState(WawaState.Spent);
+        setTimeout(() => {
+          if (wawaState === WawaState.Spent) setWawaState(WawaState.Normal);
+        }, 500);
+    };
+
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const toggleSettings = () => setIsSettingsOpen(!isSettingsOpen);
 
@@ -223,15 +203,15 @@ export default function Home() {
             setBotClicking((prevClicking) => prevClicking + 1);
             setBotBuyButtonText("Bought!");
             ouchBuy();
-            setTimeout(() => setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!"), 1000);
-            setBotButtonColor("bg-green-500 hover:bg-green-600");
+            setTimeout(() => setBotBuyButtonText("30 W$ - Auto Clicker Tier 1"), 1000);
+            setBotButtonColor("default");
         } else {
             setBotBuyButtonText("Too Expensive 3:");
-            setBotButtonColor("bg-red-500 hover:bg-red-600");
-            bwomp();
+            setBotButtonColor("destructive");
+            playSound(sadAudio);
             setTimeout(() => {
-                setBotBuyButtonText("30W$ - wawabot3000 - buy nao!!!");
-                setBotButtonColor("bg-green-500 hover:bg-green-600");
+                setBotBuyButtonText("30 W$ - Auto Clicker Tier 1");
+                setBotButtonColor("default");
             }, 1000);
         }
     };
@@ -242,245 +222,233 @@ export default function Home() {
             setForumClicking((prevClicking) => prevClicking + 1);
             setForumBuyButtonText("Bought!");
             ouchBuy();
-            setTimeout(() => setForumBuyButtonText("150W$ - ask for wawas on forum - buy nao!!!"), 1000);
-            setForumButtonColor("bg-green-500 hover:bg-green-600");
+            setTimeout(() => setForumBuyButtonText("150 W$ - Auto Clicker Tier 2"), 1000);
+            setForumButtonColor("default");
         } else {
             setForumBuyButtonText("Too Expensive 3:");
-            setForumButtonColor("bg-red-500 hover:bg-red-600");
-            bwomp();
+            setForumButtonColor("destructive");
+            playSound(sadAudio);
             setTimeout(() => {
-                setForumBuyButtonText("150W$ - ask for wawas on forum - buy nao!!!");
-                setForumButtonColor("bg-green-500 hover:bg-green-600");
+                setForumBuyButtonText("150 W$ - Auto Clicker Tier 2");
+                setForumButtonColor("default");
             }, 1000);
         }
     };
 
+
     if (!isClient) {
-        return null; // Or a loading spinner
+        return <div className="flex items-center justify-center min-h-screen w-full"><p>Loading...</p></div>; // Or a loading spinner
     }
+    
+    const wawaImageSrc = wawaState === WawaState.Wawa ? "https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/wa.png"
+        : wawaState === WawaState.Unwawa ? "https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/sad.png"
+        : wawaState === WawaState.Pet ? "https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/yay.png"
+        : wawaState === WawaState.Spent ? "https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/spent.png"
+        : "https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/aw.png";
+
+    const wawaImageAlt = wawaState === WawaState.Wawa ? ":D"
+        : wawaState === WawaState.Unwawa ? ":("
+        : wawaState === WawaState.Pet ? "^w^"
+        : wawaState === WawaState.Spent ? ":3 $"
+        : ":3";
+        
+    const wawaImageAnimation = wawaState === WawaState.Pet ? "animate-bounce" : "animate-wiggle";
+
 
     return (
-        <main
-            className={`flex flex-col items-start justify-center min-h-screen p-4 ${theme === "dark"
-                ? "bg-blue-950 text-white"
-                : "bg-white text-black"
-                }`}
-        >
-            <h1
-                className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-8 ${theme === "dark" ? "text-white" : ""
-                    }`}
-            >
-                You have wawa'd
+        <div className="flex flex-col items-center justify-center min-h-screen p-4 relative">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-center">
+                Tap Counter
             </h1>
             <motion.div
-                className={`text-6xl md:text-7xl lg:text-8xl font-semibold mb-12 transition-all duration-500`}
+                key={count} // Add key to force re-render on count change for animation
+                initial={{ scale: count > 0 ? 1.1 : 1 }} // Slightly larger scale for increment
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                className="text-7xl md:text-8xl font-semibold mb-10 text-center"
             >
-                {count < 0 ? (
-                    <span className="text-red-500">{count} times...</span>
-                ) : (
-                    <>
-                        <span className={theme === "dark" ? "text-white" : ""}>
-                            {count}
-                        </span> times!
-                    </>
-                )}
+                {count}
             </motion.div>
 
-            <div className="flex space-x-4 relative">
+            <div className="flex space-x-4 mb-8">
                 <Button
                     variant="default"
-                    className={`text-lg md:text-xl p-6 rounded-full transition-transform active:scale-95 ${theme === "dark"
-                        ? "bg-white text-black"
-                        : "bg-gray-400 text-white"
-                        }`}
+                    size="lg"
+                    className="px-8 py-4 text-xl rounded-lg shadow-md active:scale-95 transition-transform"
                     onClick={incrementCount}
                 >
-                    Wawa :3
+                    Increment
                 </Button>
                 <Button
-                    variant={theme === "dark" ? "secondary" : "destructive"}
-                    className={`text-lg md:text-xl p-6 rounded-full transition-transform active:scale-95 ${theme === "dark" ? "bg-blue-400 text-white" : ""}`}
-                    onClick={deincrementCount}>
-                    Unwawa 3:
+                    variant="default" // Changed to default to use primary (Teal)
+                    size="lg"
+                    className="px-8 py-4 text-xl rounded-lg shadow-md active:scale-95 transition-transform"
+                    onClick={resetCount}
+                >
+                    Reset
                 </Button>
             </div>
-
-            <div className={imagePositionClass} onClick={incrementCountByPet}>
-                {wawaState === WawaState.Wawa ? (
- <Image
- src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/wa.png"
- alt=":D"
- width={500}
- height={500}
- className={`animate-wiggle ${theme === "dark" ? "invert" : ""}`}
- priority
- unoptimized
- />
-                ) : wawaState === WawaState.Unwawa ? (
- <Image
- src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/sad.png"
- alt=":("
- width={500}
- height={500}
- className={`animate-wiggle ${theme === "dark" ? "invert" : ""}`}
- unoptimized
- />
-                ) : wawaState === WawaState.Pet ? (
- <Image
- src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/yay.png"
- alt="^w^"
- width={500}
- height={500}
- className={`animate-bounce ${theme === "dark" ? "invert" : ""}`}
- priority
- unoptimized
- />
-                ) : wawaState === WawaState.Spent ? (
- <Image
- src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/spent.png"
- alt=":3 $"
- width={500}
- height={500}
- className={`animate-wiggle ${theme === "dark" ? "invert" : ""}`}
- priority
- unoptimized
- />
-                ) : (
- <Image src="https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/img/old/aw.png" alt=":3" width={500} height={500} className={theme === "dark" ? "invert" : ""} unoptimized />
-                )}
+            
+            {/* Wawa Image as a clickable pet */}
+            <div className={`${imagePositionClass} cursor-pointer`} onClick={incrementCountByPet} data-ai-hint="cute cat">
+                 <Image
+                    src={wawaImageSrc}
+                    alt={wawaImageAlt}
+                    width={isMobileDevice ? 150 : 250}
+                    height={isMobileDevice ? 150 : 250}
+                    className={`${wawaImageAnimation} ${theme === "dark" && wawaState !== WawaState.Spent ? "invert" : ""}`} // Only invert non-spent wawa in dark mode
+                    priority
+                    unoptimized
+                />
             </div>
 
+
+            {/* Shop Button */}
             <Sheet open={isMenuOpen} onOpenChange={toggleMenu}>
                 <SheetTrigger asChild>
-                    <div className="absolute right-4 top-4 z-50 cursor-pointer">
-                        <FaShoppingCart size={30} color={theme === "dark" ? "white" : "black"} />
-                    </div>
+                    <Button variant="ghost" size="icon" className="absolute right-4 top-4 z-50">
+                        <FaShoppingCart size={24} />
+                         <span className="sr-only">Open Shop</span>
+                    </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="bg-opacity-95 backdrop-blur-md">
-                    <div className="w-full flex justify-center items-center">
-                        <h4 className="font-bold text-xl text-white p-2">The Shoppe~</h4>
-                    </div>
-                    <Divider /> 
-                    <div className="flex flex-col gap-4 w-full justify-start items-stretch">
-                        <Button className={`font-bold ${botButtonColor} text-white`} onClick={handleBotBuyButtonClick}>
-                            {botBuyButtonText}
-                        </Button>
-                         <Divider />
-                        <Button className={`font-bold ${forumButtonColor} text-white`} onClick={handleForumBuyButtonClick}>
-                            {forumBuyButtonText}
-                        </Button>
+                <SheetContent side="right" className="bg-background/95 backdrop-blur-sm">
+                     <div className="p-4">
+                        <h4 className="text-xl font-semibold text-center mb-4">The Shoppe~</h4>
+                        <div className="flex flex-col gap-4">
+                            <Button variant={botButtonColor} className="font-semibold" onClick={handleBotBuyButtonClick}>
+                                {botBuyButtonText}
+                            </Button>
+                            <Button variant={forumButtonColor} className="font-semibold" onClick={handleForumBuyButtonClick}>
+                                {forumBuyButtonText}
+                            </Button>
+                        </div>
                     </div>
                 </SheetContent>
             </Sheet>
 
+            {/* Changelog Button */}
             <DropdownMenu open={changelogOpen} onOpenChange={setChangelogOpen}>
                 <DropdownMenuTrigger asChild>
-                    <div className="absolute right-12 top-4 z-50 cursor-pointer flex items-center space-x-2">
-                        <FiFileText size={30} color={theme === "dark" ? "white" : "black"} />
-                    </div>
+                     <Button variant="ghost" size="icon" className="absolute right-16 top-4 z-50">
+                        <FiFileText size={24} />
+                        <span className="sr-only">Open Changelog</span>
+                    </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="p-0 w-[400px] h-[400px]">
-                    <iframe src="https://austin2wafflez.github.io/wawaclicker/changelog.html" className="w-full h-full border-0"></iframe>
+                <DropdownMenuContent className="p-0 w-[clamp(300px,80vw,500px)] h-[clamp(300px,70vh,600px)]" align="end">
+                    <iframe src="changelog.html" className="w-full h-full border-0 rounded-md"></iframe>
                 </DropdownMenuContent>
             </DropdownMenu>
-            
+
+            {/* Settings Button */}
             <Sheet open={isSettingsOpen} onOpenChange={toggleSettings}>
                 <SheetTrigger asChild>
-                    <div className="absolute right-20 top-4 z-50 cursor-pointer">
-                        <FaCog size={30} color={theme === "dark" ? "white" : "black"} />
-                    </div>
+                     <Button variant="ghost" size="icon" className="absolute right-28 top-4 z-50">
+                        <FaCog size={24} />
+                         <span className="sr-only">Open Settings</span>
+                    </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="bg-opacity-95 backdrop-blur-md">
-                    <div className="w-full flex justify-center items-center">
-                        <h4 className="font-bold text-xl text-white p-2">Settoing</h4>
+                <SheetContent side="left" className="bg-background/95 backdrop-blur-sm">
+                    <div className="p-4">
+                        <h4 className="text-xl font-semibold text-center mb-6">Settings</h4>
+                        <div className="flex flex-col gap-4">
+                            <Button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+                                Toggle Theme: Currently {theme === "dark" ? "Dark" : "Light"}
+                            </Button>
+                             <Button onClick={() => setMute(prev => prev === 0 ? 1 : 0)}>
+                                {mute === 0 ? "Mute Sounds" : "Unmute Sounds"}
+                            </Button>
+
+                            <Button onClick={() => {
+                                const wawasValue = getCookie('wawas_count') || '0';
+                                const botsValue = getCookie('wawabots_count') || '0';
+                                const forumsValue = getCookie('wawaforums_count') || '0';
+                                const themeValue = getCookie('app_theme') || 'light';
+                                const muteValue = getCookie('app_mute') || '0';
+
+                                const saveContent = `wawa-${wawasValue}\nbots-${botsValue}\nforums-${forumsValue}\ntheme-${themeValue}\nmute-${muteValue}`;
+                                const blob = new Blob([saveContent], { type: 'text/plain' });
+                                const url = URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = 'tap_counter_save.wawa';
+                                link.click();
+                                URL.revokeObjectURL(url);
+                                toast.success("Save file downloaded!");
+                            }}>Save Data to File</Button>
+
+                            <input
+                                type="file"
+                                accept=".wawa"
+                                onChange={(event) => {
+                                    const file = event.target.files?.[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onload = (e) => {
+                                            try {
+                                                const content = e.target?.result as string;
+                                                const lines = content.split('\n');
+                                                let newWawas = count;
+                                                let newBots = botClicking;
+                                                let newForums = forumClicking;
+                                                let newTheme = theme;
+                                                let newMute = mute;
+
+                                                lines.forEach(line => {
+                                                    if (line.startsWith('wawa-')) newWawas = parseInt(line.substring('wawa-'.length));
+                                                    else if (line.startsWith('bots-')) newBots = parseInt(line.substring('bots-'.length));
+                                                    else if (line.startsWith('forums-')) newForums = parseInt(line.substring('forums-'.length));
+                                                    else if (line.startsWith('theme-')) newTheme = line.substring('theme-'.length);
+                                                    else if (line.startsWith('mute-')) newMute = parseInt(line.substring('mute-'.length));
+                                                });
+
+                                                setCount(newWawas);
+                                                setBotClicking(newBots);
+                                                setForumClicking(newForums);
+                                                if(newTheme) setTheme(newTheme);
+                                                setMute(newMute);
+                                                
+                                                // Also update cookies immediately
+                                                setCookie('wawas_count', newWawas.toString(), { path: '/' });
+                                                setCookie('wawabots_count', newBots.toString(), { path: '/' });
+                                                setCookie('wawaforums_count', newForums.toString(), { path: '/' });
+                                                if(newTheme) setCookie('app_theme', newTheme, { path: '/' });
+                                                setCookie('app_mute', newMute.toString(), { path: '/' });
+
+                                                toast.success("Data loaded from file! Reloading...");
+                                                setTimeout(() => window.location.reload(), 1500);
+                                            } catch (err) {
+                                                toast.error("Failed to load save file. It might be corrupted.");
+                                                console.error("Error loading save file:", err);
+                                            }
+                                        };
+                                        reader.readAsText(file);
+                                    }
+                                }}
+                                className="hidden"
+                                id="load-wawa-file"
+                            />
+                            <Button asChild>
+                                <label htmlFor="load-wawa-file" className="cursor-pointer">
+                                    Load Data from File (.wawa)
+                                </label>
+                            </Button>
+                        </div>
                     </div>
-                    <Divider />
-                    <Button onClick={() => { 
-                    setTheme(theme === "dark" ? "light" : "dark"); 
-                    setCookie('theme', theme === "dark" ? "light" : "dark");
-                    }}>Dark/Light Mode - Currently {theme}
-                    </Button>
-                    <Divider />
-
-                                       <Button onClick={() => {
-                        const wawasValue = getCookie('wawas');
-                        const wawabotsValue = getCookie('wawabots');
-                        const wawaforumsValue = getCookie('wawaforums');
-
-                        const saveContent = `wawa-${wawasValue || '0'}\nbots-${wawabotsValue || '0'}\nforums-${wawaforumsValue || '0'}`;
-                        const blob = new Blob([saveContent], { type: 'text/plain' });
-                        const url = URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = 'yoursave.wawa';
-                        link.click();
-                        URL.revokeObjectURL(url); // Clean up the object URL
-                    }}>save stuff to file</Button>
-                    <Divider/>
-                   <input
-                        type="file"
-                        accept=".wawa"
-                        onChange={(event) => {
-                            const file = event.target.files?.[0];
-                            if (file) {
-                                const reader = new FileReader();
-                                reader.onload = (e) => {
-                                    const content = e.target?.result as string;
-                                    const lines = content.split('\n');
-                                    let newWawas = count;
-                                    let newBots = botClicking;
-                                    let newForums = forumClicking;
-
-                                    lines.forEach(line => {
-                                        if (line.startsWith('wawa-')) {
-                                            newWawas = parseInt(line.substring('wawa-'.length));
-                                        } else if (line.startsWith('bots-')) {
-                                            newBots = parseInt(line.substring('bots-'.length));
-                                        } else if (line.startsWith('forums-')) {
-                                            newForums = parseInt(line.substring('forums-'.length));
-                                        }
-                                    });
-
-                                    setCount(newWawas);
-                                    setBotClicking(newBots);
-                                    setForumClicking(newForums);
-
-                                    setCookie('wawas', newWawas.toString());
-                                    setCookie('wawabots', newBots.toString());
-                                    setCookie('wawaforums', newForums.toString());
-                                    window.location.reload();
-                                };
-                                reader.readAsText(file);
-                            }
-                        }}
-                        className="hidden"
-                        id="load-wawa-file"
-                    />
-                    <label htmlFor="load-wawa-file" className="cursor-pointer bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded">
-                        load stuff from file (.wawa)
-                    </label>
-                    <Divider />
-                    <Button onClick={() => { 
-                    setMute(mute === 0 ? 1 : 0);
-                    }}>Mute/Unmute - Currently {mute ? "muted" : "unmuted"}
-                    <Divider />
-                    </Button>
-<Divider/>
-
                 </SheetContent>
             </Sheet>
 
-            <div className="absolute bottom-4 w-full text-center text-gray-500 text-sm">
+
+            <div className="absolute bottom-4 w-full text-center text-muted-foreground text-sm">
                 {testing ? (
-                    <a href="https://wawa-clicker.web.app" className="underline" target="_blank" rel="noopener noreferrer">
-                        click here to go back to the stable build!
+                    <a href="https://tap-counter-app.web.app" className="underline" target="_blank" rel="noopener noreferrer">
+                        View stable build
                     </a>
                 ) : (
-                    <a href="https://9000-idx-studio-1745504646182.cluster-rhptpnrfenhe4qarq36djxjqmg.cloudworkstations.dev/?monospaceUid=572770" className="underline" target="_blank" rel="noopener noreferrer">
-                        wanna try stuff AS I ADD IT? click here!! (warning - breaks often, subject to going down when i'm not working)
+                     <a href="https://wawa-clicker.web.app" className="underline" target="_blank" rel="noopener noreferrer">
+                        You are on the stable build. (Old link, dev build may be unavailable)
                     </a>
                 )}
             </div>
-        </main>
+        </div>
     );
 }
