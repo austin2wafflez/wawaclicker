@@ -38,11 +38,11 @@ export default function Home() {
     // wawa 
     enum WawaState { Normal = 'normal', Wawa = 'wawa', Unwawa = 'unwawa', Recover = 'rewawa', Spent = 'money', Pet = 'yayay' }
     const [wawaState, setWawaState] = useState<WawaState>(WawaState.Normal);
-    const squeak = () => {
-        const audio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/squee.mp3');
+    const squeak = () => { 
+        const audio = new Audio('https://raw.githubusercontent.com/austin2wafflez/wawaclicker/master/src/app/sfx/squee.wav');
         audio.volume = 0.25;
         audio.play();
-    };
+    }
 
     // menus
     const [isMenuOpen, setIsMenuOpen] = useState(false);
