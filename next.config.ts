@@ -1,8 +1,7 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  // output: 'export', // Removed to enable server mode
+  output: 'export', // Enable static export
   typescript: {
     ignoreBuildErrors: true,
   },
